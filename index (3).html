@@ -1,0 +1,2951 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galaxy City QR - 创意数字体验</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap');
+
+:root {
+  /* JSON配置的调色板 */
+  --primary-white: #ffffff;
+  --text-dark: #4a5963;
+  --water-teal: #7ac5c7;
+  --park-green: #5fa36a;
+  --gold-main: #ffb703;
+  --red-accent: #ff6b6b;
+  --yellow-bright: #ffd93d;
+  --blue-nav: #4d96ff;
+  --orange-accent: #ff6b35;
+  --yellow-vehicle: #f5d142;
+
+  --sky: #0b0e23;
+  --deep: #060812;
+  --nebula1: #1a0a3d;
+  --nebula2: #0a1a3d;
+  --road: #c8a84b;
+  --road-glow: rgba(200,168,75,0.6);
+  --park: #1db954;
+  --park-glow: rgba(29,185,84,0.4);
+  --nav: #00fff2;
+  --sun: #ffd700;
+  --accent: #ff6b9d;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--deep);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 14vh;
+  font-family: 'Exo 2', sans-serif;
+  overflow: hidden;
+}
+
+/* ── GALAXY CANVAS ── */
+#galaxy-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* ── OUTER SCENE ── */
+.scene {
+  position: relative;
+  width: 700px;
+  height: 880px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── PLANET ORBITS ── */
+.orbit-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.07);
+  pointer-events: none;
+}
+
+/* ── CALLEN TITLE ── */
+.main-title {
+  position: absolute;
+  top: -75px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 200;
+  line-height: 1;
+  text-align: center;
+}
+.callen-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  position: relative;
+  justify-content: center;
+}
+.callen-letter {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 48px;
+  letter-spacing: 2px;
+  display: inline-block;
+  animation: callenBounce 3s ease-in-out infinite;
+}
+.callen-letter:nth-child(1){ color:var(--sun); animation-delay:0s;   text-shadow: 0 0 18px var(--sun), 0 0 36px rgba(255,215,0,0.5); }
+.callen-letter:nth-child(2){ color:var(--nav); animation-delay:0.12s; text-shadow: 0 0 18px var(--nav), 0 0 36px rgba(0,255,242,0.5); }
+.callen-letter:nth-child(3){ color:var(--accent); animation-delay:0.24s; text-shadow: 0 0 18px var(--accent), 0 0 36px rgba(255,107,157,0.5); }
+.callen-letter:nth-child(4){ color:#a29bfe; animation-delay:0.36s; text-shadow: 0 0 18px #a29bfe, 0 0 36px rgba(162,155,254,0.5); }
+.callen-letter:nth-child(5){ color:#55efc4; animation-delay:0.48s; text-shadow: 0 0 18px #55efc4, 0 0 36px rgba(85,239,196,0.5); }
+.callen-letter:nth-child(6){ color:#fd79a8; animation-delay:0.60s; text-shadow: 0 0 18px #fd79a8, 0 0 36px rgba(253,121,168,0.5); }
+@keyframes callenBounce {
+  0%,100%{ transform: translateY(0) scale(1); }
+  30%    { transform: translateY(-6px) scale(1.1); }
+  60%    { transform: translateY(2px) scale(0.95); }
+}
+.callen-bar {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--sun), var(--nav), var(--accent), #a29bfe, transparent);
+  margin-top: 4px;
+  animation: barShimmer 3s linear infinite;
+  background-size: 200% 100%;
+}
+@keyframes barShimmer { 0%{background-position:0%} 100%{background-position:200%} }
+.callen-tagline {
+  display: block;
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 300;
+  font-size: 10px;
+  letter-spacing: 6px;
+  color: rgba(220,235,255,1);
+  text-shadow: 0 0 10px rgba(180,220,255,0.6);
+  margin-top: 3px;
+  opacity: 1 !important;
+  transition: none !important;
+}
+
+.sub-title {
+  position: absolute;
+  bottom: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 300;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: rgba(200,220,255,0.0);
+  white-space: nowrap;
+  opacity: 0;
+}
+
+/* ── NATURE FRAME ── */
+.nature-frame {
+  position: absolute;
+  width: 560px;
+  height: 620px;
+  pointer-events: none;
+  z-index: 110;
+  overflow: visible;
+}
+
+/* ── QR CARD ── */
+.qr-card {
+  position: relative;
+  width: 460px;
+  height: 460px;
+  z-index: 100;
+  flex-shrink: 0;
+  overflow: visible;
+  animation: qrHover 3s ease-in-out infinite;
+}
+@keyframes qrHover {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-6px); }
+}
+
+.qr-border {
+  display: none;
+}
+
+.qr-border-solid {
+  display: none;
+}
+
+.qr-inner {
+  position: absolute;
+  inset: 0;
+  border-radius: 0;
+  overflow: hidden;
+  z-index: 2;
+  background: #f5faf2;
+  box-shadow: 
+    0 0 0 3px rgba(0,255,242,0.3),
+    0 0 50px rgba(0,255,242,0.18),
+    0 0 100px rgba(123,47,247,0.14),
+    0 30px 80px rgba(0,0,0,0.6);
+}
+
+#qrcode {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+#qrcode canvas { width: 460px !important; height: 460px !important; }
+
+.city-svg {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.scan-beam {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--water-teal) 30%, rgba(0,255,242,0.9) 50%, var(--water-teal) 70%, transparent 100%);
+  z-index: 10;
+  animation: beam 5s ease-in-out infinite;
+  box-shadow: 0 0 12px var(--water-teal), 0 0 30px rgba(0,255,242,0.4);
+}
+@keyframes beam {
+  0%  { top: 10px;  opacity: 0; }
+  5%  { opacity: 1; }
+  90% { opacity: 1; }
+  100%{ top: 450px; opacity: 0; }
+}
+
+/* ── VEHICLES ── */
+.v { position: absolute; font-size: 13px; z-index: 9; line-height: 1; filter: drop-shadow(0 0 4px rgba(255,255,255,0.6)); }
+
+/* ── FLOATING ICONS ── */
+.ficon {
+  position: absolute;
+  font-size: 16px;
+  z-index: 9;
+  animation: fFloat ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(0,255,242,0.6));
+}
+
+/* ── QR GROUND SHADOW (day only) ── */
+#qr-ground-shadow {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%) skewX(-18deg) scaleY(0.38);
+  width: 480px;
+  height: 220px;
+  background: radial-gradient(ellipse 88% 60% at 55% 30%,
+    rgba(0,0,0,0.42) 0%,
+    rgba(0,0,0,0.22) 40%,
+    rgba(0,0,0,0.08) 70%,
+    transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 3s ease;
+  filter: blur(6px);
+}
+body.day-mode   #qr-ground-shadow { opacity: 1; }
+body.night-mode #qr-ground-shadow { opacity: 0; }
+
+
+/* ── BEIJING CLOCK ── */
+#beijing-clock {
+  position: fixed;
+  top: 18px;
+  right: 22px;
+  z-index: 300;
+  text-align: right;
+  pointer-events: none;
+  font-family: 'Orbitron', 'Noto Sans SC', monospace;
+  line-height: 1.35;
+  transition: color 3s ease, text-shadow 3s ease;
+}
+body.day-mode #beijing-clock {
+  color: rgba(30,60,100,0.88);
+  text-shadow: 0 1px 4px rgba(255,255,255,0.6);
+}
+body.night-mode #beijing-clock {
+  color: rgba(180,220,255,0.92);
+  text-shadow: 0 0 10px rgba(100,180,255,0.7), 0 0 20px rgba(80,140,255,0.4);
+}
+#beijing-clock .clock-time {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+#beijing-clock .clock-date {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  opacity: 0.82;
+  margin-top: 1px;
+}
+#beijing-clock .clock-label {
+  font-size: 8px;
+  letter-spacing: 2px;
+  opacity: 0.6;
+  text-transform: uppercase;
+}
+
+@keyframes fFloat {
+  0%,100%{transform: translateY(0) scale(1);}
+  50%{transform: translateY(-6px) scale(1.15);}
+}
+
+/* ── CORNER MARKERS ── */
+.corner-marker {
+  position: absolute;
+  z-index: 11;
+  width: 48px; height: 48px;
+}
+.corner-marker .dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--nav);
+  box-shadow: 0 0 10px var(--nav), 0 0 20px rgba(0,255,242,0.5);
+  animation: dotPulse 2s ease-in-out infinite;
+}
+@keyframes dotPulse {
+  0%,100%{transform:scale(1); opacity:1;}
+  50%{transform:scale(1.6); opacity:0.6;}
+}
+.corner-marker .label {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  color: var(--nav);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+/* ── NATURE ELEMENTS ── */
+.sun-outer {
+  position: absolute;
+  top: -18px; right: -18px;
+  width: 70px; height: 70px;
+}
+
+.rainbow-arc {
+  position: absolute;
+  top: -10px; left: -30px;
+  width: 180px; height: 90px;
+}
+
+.water-strip {
+  position: absolute;
+  bottom: -22px; left: 30px; right: 30px;
+  height: 36px;
+}
+
+.tree-cluster { position: absolute; }
+
+.sparkle {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: sparkleAnim ease-in-out infinite;
+}
+@keyframes sparkleAnim {
+  0%,100%{opacity:0; transform:scale(0)}
+  50%{opacity:1; transform:scale(1)}
+}
+
+.meteor {
+  position: fixed;
+  width: 120px; height: 2px;
+  background: linear-gradient(90deg, transparent, white);
+  border-radius: 2px;
+  animation: meteorFall linear infinite;
+  z-index: 0;
+  opacity: 0;
+}
+@keyframes meteorFall {
+  0%  { opacity:0; transform: translateX(0) translateY(0) rotate(-35deg); }
+  10% { opacity:1; }
+  80% { opacity:1; }
+  100%{ opacity:0; transform: translateX(400px) translateY(300px) rotate(-35deg); }
+}
+
+/* ── DAY / NIGHT CYCLE ── */
+#day-night-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: background 3s ease;
+}
+
+.qr-inner {
+  transition: background 3s ease;
+}
+
+#celestial-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 25;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.celestial-body {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 38px;
+  line-height: 1;
+  transition: all 1.5s ease;
+  position: relative;
+}
+
+.celestial-body.sun-mode {
+  background: radial-gradient(circle, rgba(255,240,100,0.25) 0%, transparent 70%);
+  box-shadow: 0 0 20px rgba(255,215,0,0.7), 0 0 40px rgba(255,215,0,0.3);
+  animation: celestialPulse 3s ease-in-out infinite;
+}
+
+.celestial-body.moon-mode {
+  background: radial-gradient(circle, rgba(200,210,255,0.2) 0%, transparent 70%);
+  box-shadow: 0 0 16px rgba(180,200,255,0.6), 0 0 32px rgba(180,200,255,0.2);
+  animation: moonGlow 4s ease-in-out infinite;
+}
+
+@keyframes celestialPulse {
+  0%,100%{ box-shadow: 0 0 20px rgba(255,215,0,0.7), 0 0 40px rgba(255,215,0,0.3); transform:scale(1); }
+  50%{ box-shadow: 0 0 30px rgba(255,215,0,0.9), 0 0 60px rgba(255,215,0,0.4); transform:scale(1.08); }
+}
+
+@keyframes moonGlow {
+  0%,100%{ box-shadow: 0 0 16px rgba(180,200,255,0.6), 0 0 32px rgba(180,200,255,0.2); transform:scale(1); }
+  50%{ box-shadow: 0 0 24px rgba(180,200,255,0.9), 0 0 48px rgba(180,200,255,0.35); transform:scale(1.05); }
+}
+
+.celestial-time-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  letter-spacing: 2px;
+  transition: color 1.5s ease, opacity 1.5s ease;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+body.day-mode {
+  background: #d4e8f5;
+  transition: background 3s ease;
+}
+
+body.night-mode {
+  background: var(--deep);
+  transition: background 3s ease;
+}
+
+.qr-inner.day-qr {
+  background: #f8fffb !important;
+}
+
+.qr-inner.night-qr {
+  background: #f5faf2;
+}
+
+/* ── 3D QR CARD THICKNESS (增加到36px) ── */
+.qr-card {
+  transform-style: preserve-3d;
+  perspective: 900px;
+}
+
+.qr-slab-bottom {
+  position: absolute;
+  left: -14px; right: -14px;
+  bottom: -14px;
+  height: 14px;
+  z-index: 1;
+  background: linear-gradient(180deg,
+    #e8eaec 0%, #c8cdd2 15%, #a0a8b0 30%,
+    #8a9298 45%, #b0b8c0 55%, #d0d5da 70%,
+    #9aa0a8 85%, #787e85 100%);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.6);
+}
+.qr-slab-bottom::before { display: none; }
+.qr-slab-bottom::after  { display: none; }
+
+.qr-slab-left {
+  position: absolute;
+  left: -14px; top: 0; bottom: -14px;
+  width: 14px;
+  z-index: 1;
+  background: linear-gradient(90deg,
+    #787e85 0%, #9aa0a8 15%, #d0d5da 30%,
+    #b0b8c0 45%, #8a9298 55%, #a0a8b0 70%,
+    #c8cdd2 85%, #e8eaec 100%);
+  box-shadow: -3px 0 10px rgba(0,0,0,0.45), inset 1px 0 0 rgba(255,255,255,0.5);
+}
+
+.qr-slab-right {
+  position: absolute;
+  right: -14px; top: 0; bottom: -14px;
+  width: 14px;
+  z-index: 1;
+  background: linear-gradient(270deg,
+    #787e85 0%, #9aa0a8 15%, #d0d5da 30%,
+    #b0b8c0 45%, #8a9298 55%, #a0a8b0 70%,
+    #c8cdd2 85%, #e8eaec 100%);
+  box-shadow: 3px 0 10px rgba(0,0,0,0.45), inset -1px 0 0 rgba(255,255,255,0.5);
+}
+
+/* Top edge */
+.qr-slab-top {
+  position: absolute;
+  left: -14px; right: -14px;
+  top: -14px;
+  height: 14px;
+  z-index: 1;
+  background: linear-gradient(0deg,
+    #e8eaec 0%, #c8cdd2 15%, #a0a8b0 30%,
+    #8a9298 45%, #b0b8c0 55%, #d0d5da 70%,
+    #9aa0a8 85%, #787e85 100%);
+  box-shadow: 0 -3px 10px rgba(0,0,0,0.4), inset 0 -1px 0 rgba(255,255,255,0.55);
+}
+
+/* Titanium micro-grain texture overlay on all slabs */
+.qr-slab-top::after, .qr-slab-bottom::after,
+.qr-slab-left::after, .qr-slab-right::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      92deg,
+      transparent 0px, transparent 2px,
+      rgba(255,255,255,0.06) 2px, rgba(255,255,255,0.06) 3px
+    ),
+    repeating-linear-gradient(
+      178deg,
+      transparent 0px, transparent 3px,
+      rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px
+    );
+  pointer-events: none;
+}
+
+.qr-corner-bl { display: none; }
+.qr-corner-br { display: none; }
+
+/* ── BOAT PROGRESS BAR WITH WAVES ── */
+.boat-progress-container {
+  position: absolute;
+  width: 420px;
+  height: 60px;
+  left: 20px;
+  bottom: -92px;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.boat-progress-bar {
+  position: absolute;
+  width: 100%;
+  height: 12px;
+  top: 20px;
+  left: 0;
+  background: linear-gradient(90deg, rgba(122,197,199,0.15) 0%, rgba(122,197,199,0.25) 50%, rgba(122,197,199,0.15) 100%);
+  border: 1px solid rgba(122,197,199,0.4);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.boat-progress-fill {
+  position: absolute;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #7ac5c7, #4d96ff, #7ac5c7);
+  border-radius: 6px;
+  animation: boatProgressFill 8s linear infinite;
+  box-shadow: 0 0 8px rgba(122,197,199,0.6), inset 0 0 4px rgba(255,255,255,0.4);
+}
+
+@keyframes boatProgressFill {
+  0%   { width: 0%; }
+  100% { width: 100%; }
+}
+
+.boat-wave-splash {
+  position: absolute;
+  width: 12px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(122,197,199,0.6);
+  pointer-events: none;
+  animation: waveSplash 1.2s ease-out forwards;
+}
+
+.boat-icon {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  top: -8px;
+  font-size: 20px;
+  line-height: 24px;
+  text-align: center;
+  z-index: 10;
+  animation: boatMove 8s linear infinite;
+  transition: filter 2.5s ease, opacity 2.5s ease;
+  filter: drop-shadow(0 0 4px rgba(255,255,255,0.6));
+}
+
+body.day-mode .boat-icon {
+  opacity: 1;
+  filter: drop-shadow(0 0 4px rgba(255,255,255,0.6));
+}
+
+body.night-mode .boat-icon {
+  opacity: 1;
+  filter: drop-shadow(0 0 8px rgba(255,200,100,0.9)) drop-shadow(0 0 16px rgba(255,150,50,0.7)) drop-shadow(0 0 24px rgba(255,100,0,0.4));
+}
+
+@keyframes boatMove {
+  0%   { left: 0%; transform: translateX(0) scaleX(1); }
+  99%  { left: 100%; transform: translateX(-24px) scaleX(1); }
+  100% { left: 0%; transform: translateX(0) scaleX(1); }
+}
+
+@keyframes waveSplash {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  50%  { opacity: 0.8; transform: translateY(-8px) scale(1.2); }
+  100% { opacity: 0; transform: translateY(-20px) scale(0.5); }
+}
+
+.boat-progress-label {
+  position: absolute;
+  width: 100%;
+  top: 35px;
+  text-align: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  color: rgba(122,197,199,0.7);
+  letter-spacing: 2px;
+}
+
+/* ── ROCKET THRUSTER ── */
+.rocket-thruster-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: -70px;
+  transform: translateX(-50%);
+  z-index: 0;
+  pointer-events: none;
+  width: 360px;
+  height: 65px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 36px;
+  transition: opacity 2.5s ease;
+}
+
+/* Engine brightness controlled dynamically by JS based on boat progress */
+body.night-mode .rocket-thruster-wrap { opacity: 1; }
+body.day-mode .rocket-thruster-wrap   { opacity: 1; }
+
+.rocket-engine {
+  position: relative;
+  width: 44px;
+  height: 65px;
+}
+
+.rocket-engine .nozzle {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 20px; height: 14px;
+  background: linear-gradient(180deg, #666 0%, #444 40%, #2a2a2a 100%);
+  border-radius: 3px 3px 10px 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6), inset 0 1px 0 rgba(200,200,200,0.3);
+  z-index: 2;
+}
+
+.rocket-engine .nozzle::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 50%; transform: translateX(-50%);
+  width: 24px; height: 4px;
+  border-radius: 0 0 8px 8px;
+  background: #333;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.rocket-engine .exhaust-core {
+  position: absolute;
+  top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 10px; height: 32px;
+  border-radius: 4px 4px 50% 50%;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,1) 0%,
+    rgba(200,230,255,0.95) 15%,
+    rgba(100,180,255,0.85) 35%,
+    rgba(60,120,255,0.6) 55%,
+    rgba(255,150,50,0.4) 75%,
+    rgba(255,80,20,0.15) 90%,
+    transparent 100%);
+  animation: exhaustPulse 0.08s ease-in-out infinite alternate;
+  z-index: 1;
+}
+
+.rocket-engine .exhaust-mid {
+  position: absolute;
+  top: 10px; left: 50%;
+  transform: translateX(-50%);
+  width: 22px; height: 44px;
+  border-radius: 6px 6px 50% 50%;
+  background: linear-gradient(180deg,
+    rgba(150,200,255,0.7) 0%,
+    rgba(80,140,255,0.5) 25%,
+    rgba(255,180,60,0.4) 50%,
+    rgba(255,120,30,0.25) 70%,
+    rgba(255,60,10,0.1) 88%,
+    transparent 100%);
+  animation: exhaustPulse 0.12s ease-in-out infinite alternate-reverse;
+  filter: blur(1.5px);
+  z-index: 0;
+}
+
+.rocket-engine .exhaust-plume {
+  position: absolute;
+  top: 8px; left: 50%;
+  transform: translateX(-50%);
+  width: 36px; height: 56px;
+  border-radius: 8px 8px 50% 50%;
+  background: linear-gradient(180deg,
+    rgba(100,160,255,0.3) 0%,
+    rgba(255,160,60,0.18) 35%,
+    rgba(255,100,30,0.1) 60%,
+    rgba(255,60,10,0.04) 80%,
+    transparent 100%);
+  animation: plumeFlicker 0.18s ease-in-out infinite alternate;
+  filter: blur(3px);
+  z-index: -1;
+}
+
+.rocket-engine .mach-diamond {
+  position: absolute;
+  top: 22px; left: 50%;
+  transform: translateX(-50%);
+  width: 8px; height: 5px;
+  background: rgba(255,255,255,0.7);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  animation: machFlicker 0.1s ease-in-out infinite alternate;
+  z-index: 2;
+}
+
+.rocket-engine .mach-diamond:nth-child(6) {
+  top: 30px;
+  width: 6px; height: 4px;
+  opacity: 0.5;
+}
+
+.rocket-engine .exhaust-glow {
+  position: absolute;
+  top: 40px; left: 50%;
+  transform: translateX(-50%);
+  width: 60px; height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255,180,80,0.25) 0%,
+    rgba(255,120,40,0.1) 40%,
+    transparent 70%);
+  animation: glowPulse 0.5s ease-in-out infinite;
+  z-index: -2;
+}
+
+@keyframes exhaustPulse {
+  0%   { transform: translateX(-50%) scaleX(1) scaleY(1); opacity: 0.9; }
+  100% { transform: translateX(-50%) scaleX(0.88) scaleY(1.06); opacity: 1; }
+}
+
+@keyframes plumeFlicker {
+  0%   { transform: translateX(-50%) scaleX(1) scaleY(1); }
+  100% { transform: translateX(-50%) scaleX(0.9) scaleY(1.04); }
+}
+
+@keyframes machFlicker {
+  0%   { opacity: 0.5; transform: translateX(-50%) scale(0.9); }
+  100% { opacity: 0.8; transform: translateX(-50%) scale(1.1); }
+}
+
+@keyframes glowPulse {
+  0%,100% { opacity: 0.5; }
+  50%     { opacity: 0.9; }
+}
+
+.rocket-spark {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  animation: rocketSparkFall 0.7s ease-out forwards;
+}
+
+@keyframes rocketSparkFall {
+  0%   { opacity: 1; transform: translate(0,0) scale(1); }
+  50%  { opacity: 0.8; }
+  100% { opacity: 0; transform: translate(var(--sx), 45px) scale(0.2); }
+}
+
+.rocket-ground-glow {
+  position: absolute;
+  left: 50%;
+  bottom: -90px;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse,
+    rgba(255,160,60,0.2) 0%,
+    rgba(255,120,40,0.1) 30%,
+    rgba(100,160,255,0.06) 60%,
+    transparent 80%);
+  animation: groundHeat 0.8s ease-in-out infinite;
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity 2.5s ease;
+}
+
+body.night-mode .rocket-ground-glow { opacity: 1; }
+body.day-mode .rocket-ground-glow   { opacity: 0.5; }
+
+@keyframes groundHeat {
+  0%,100% { opacity: 0.5; transform: translateX(-50%) scaleX(1); }
+  50%     { opacity: 0.9; transform: translateX(-50%) scaleX(1.05); }
+}
+
+body.night-mode .bldg-win {
+  fill: rgba(255,255,200,1) !important;
+  transition: fill 2s ease;
+}
+
+body.day-mode .bldg-win {
+  transition: fill 2s ease;
+}
+
+body.night-mode .bldg-light-spill {
+  opacity: 1;
+  transition: opacity 2.5s ease;
+}
+
+body.day-mode .bldg-light-spill {
+  opacity: 0;
+  transition: opacity 2.5s ease;
+}
+
+.meteor {
+  transition: opacity 1s ease;
+}
+
+body.day-mode .meteor { opacity: 0 !important; animation-play-state: paused !important; }
+body.night-mode .meteor { }
+
+#galaxy-bg {
+  transition: opacity 3s ease;
+}
+
+body.day-mode #galaxy-bg { opacity: 0.08; }
+body.night-mode #galaxy-bg { opacity: 1; }
+
+/* Half-earth: 30% day, 100% night, slow 3s transition */
+body.day-mode   body.night-mode body.day-mode #day-night-overlay {
+  background: linear-gradient(180deg, rgba(110,185,215,0.65) 0%, rgba(170,215,240,0.35) 40%, rgba(255,253,230,0.15) 100%);
+}
+
+body.night-mode #day-night-overlay {
+  background: transparent;
+}
+
+body.day-mode .scan-beam {
+  background: linear-gradient(90deg, transparent 0%, rgba(0,150,255,0.6) 30%, rgba(0,200,255,0.8) 50%, rgba(0,150,255,0.6) 70%, transparent 100%);
+  box-shadow: 0 0 10px rgba(0,150,255,0.5);
+}
+
+.day-cloud {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 3s ease;
+}
+
+body.night-mode .day-cloud { opacity: 0; }
+body.day-mode .day-cloud { opacity: 1; }
+
+.mountain-group {
+  transition: opacity 3s ease;
+}
+
+
+
+.bldg-shadow {
+  pointer-events: none;
+}
+
+#train-container {
+  position: absolute;
+  z-index: 15;
+  pointer-events: none;
+  width: 460px;
+  height: 460px;
+  top: 0; left: 0;
+  overflow: visible;
+}
+
+#train {
+  position: absolute;
+  font-size: 52px;
+  line-height: 1;
+  z-index: 16;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+  transition: filter 2.5s ease, text-shadow 2.5s ease;
+  will-change: transform, left, top;
+}
+
+body.night-mode #train {
+  filter: drop-shadow(0 0 18px rgba(255,230,100,1)) drop-shadow(0 0 36px rgba(255,200,50,0.8)) drop-shadow(0 0 60px rgba(255,180,0,0.5));
+}
+
+body.day-mode #train {
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+}
+
+#train-headlight {
+  position: absolute;
+  width: 80px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255,255,200,0.7) 0%, rgba(255,255,150,0.3) 40%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2.5s ease;
+  z-index: 15;
+}
+
+body.night-mode #train-headlight { opacity: 1; }
+body.day-mode #train-headlight { opacity: 0; }
+
+.steam-puff {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(220,220,220,0.4) 50%, transparent 70%);
+  pointer-events: none;
+  z-index: 17;
+  animation: steamRise 1.2s ease-out forwards;
+}
+
+@keyframes steamRise {
+  0%   { opacity: 0.9; transform: translate(0,0) scale(0.5); }
+  40%  { opacity: 0.7; transform: translate(-8px,-18px) scale(1); }
+  100% { opacity: 0; transform: translate(-16px,-40px) scale(1.6); }
+}
+
+body.night-mode .steam-puff { display: none; }
+
+.rail-track {
+  position: absolute;
+  width: 16px;
+  height: 6px;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0;
+  animation: trackAppear 0.4s ease-out forwards;
+}
+
+@keyframes trackAppear {
+  0%   { opacity: 0; transform: scale(0.3); }
+  100% { opacity: 0.7; transform: scale(1); }
+}
+
+.rail-track .rail-l, .rail-track .rail-r {
+  position: absolute;
+  width: 100%;
+  height: 1.5px;
+  background: #8b7355;
+  border-radius: 1px;
+}
+
+.rail-track .rail-l { top: 0; }
+.rail-track .rail-r { bottom: 0; }
+
+.rail-track .tie {
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  background: #6b5a3e;
+  border-radius: 0.5px;
+}
+
+.rail-track.fading {
+  animation: trackFade 2s ease-out forwards;
+}
+
+/* ── ASTEROIDS ── */
+.asteroid {
+  position: fixed;
+  display: inline-block;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.85;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+/* Traditional art directional shadow: light from top-left, shadow bottom-right */
+.asteroid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 28% 28%,
+    transparent 25%,
+    rgba(0, 0, 18, 0.45) 65%,
+    rgba(0, 0, 28, 0.78) 100%);
+  opacity: 0;
+  transition: opacity 2s ease;
+  pointer-events: none;
+}
+body.night-mode .asteroid::after {
+  opacity: 1;
+}
+@keyframes asteroidDriftLeft3 {
+  0%   { transform: translateX(0px) rotate(0deg); }
+  100% { transform: translateX(-3px) rotate(8deg); }
+}
+@keyframes asteroidDriftRight4 {
+  0%   { transform: translateX(0px) rotate(0deg); }
+  100% { transform: translateX(4px) rotate(-6deg); }
+}
+@keyframes asteroidDriftLeft4 {
+  0%   { transform: translateX(0px) rotate(0deg); }
+  100% { transform: translateX(-4px) rotate(5deg); }
+}
+@keyframes asteroidDriftRight3 {
+  0%   { transform: translateX(0px) rotate(0deg); }
+  100% { transform: translateX(3px) rotate(-9deg); }
+}
+@keyframes asteroidFloat {
+  0%,100% { transform: translateY(0px); }
+  50%     { transform: translateY(-6px); }
+}
+
+/* ── SATELLITES ── */
+.satellite {
+  position: fixed;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.88;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+@keyframes satDriftLeft2 {
+  0%   { transform: translateX(0px) rotate(0deg); }
+  100% { transform: translateX(-2px) rotate(12deg); }
+}
+@keyframes satDriftRight3 {
+  0%   { transform: translateX(0px) rotate(0deg); }
+  100% { transform: translateX(3px) rotate(-10deg); }
+}
+@keyframes satDriftLeft3 {
+  0%   { transform: translateX(0px) rotate(0deg); }
+  100% { transform: translateX(-3px) rotate(15deg); }
+}
+/* ── ALIEN SPACESHIP (right of QR card) ── */
+#ufo-ship {
+  position: absolute;
+  right: -120px;
+  top: 38%;
+  width: 100px;
+  height: 50px;
+  z-index: 10;
+  pointer-events: none;
+  animation: ufoPatrol 7s ease-in-out infinite;
+  transform-origin: center center;
+}
+@keyframes ufoPatrol {
+  0%        { transform: translateX(0px)   scale(1.0); }
+  40%       { transform: translateX(90px)  scale(0.55); }
+  50%       { transform: translateX(110px) scale(0.48); }
+  90%       { transform: translateX(6px)   scale(0.97); }
+  100%      { transform: translateX(0px)   scale(1.0); }
+}
+/* ── DAY: hide night-only elements with smooth fade ── */
+.asteroid, .satellite, #ufo-ship {
+  transition: opacity 3s ease;
+}
+body.day-mode   .asteroid  { opacity: 0; pointer-events: none; }
+body.night-mode .asteroid  { opacity: 0.85; }
+body.day-mode   .satellite { opacity: 0; pointer-events: none; }
+body.night-mode .satellite { opacity: 0.88; }
+body.day-mode   #ufo-ship  { opacity: 0; pointer-events: none; }
+body.night-mode #ufo-ship  { opacity: 1; }
+
+/* ── COCONUT TREES (fixed, complete, overflow visible) ── */
+.coconut-tree {
+  position: fixed;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 3s ease;
+  transform-origin: bottom center;
+  overflow: visible;
+}
+body.day-mode   .coconut-tree { opacity: 1; }
+body.night-mode .coconut-tree { opacity: 0; }
+
+/* Shadow pseudo-element per tree */
+.coconut-tree::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140%;
+  height: 12px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.22) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+@keyframes palmSway {
+  0%,100% { transform: rotate(-3deg); }
+  50%     { transform: rotate(3deg); }
+}
+@keyframes palmSway2 {
+  0%,100% { transform: rotate(2deg); }
+  50%     { transform: rotate(-4deg); }
+}
+#ocean-scene {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 3s ease;
+  overflow: hidden;
+}
+body.day-mode   #ocean-scene { opacity: 1; }
+body.night-mode #ocean-scene { opacity: 0; }
+
+@keyframes waveRoll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes waveRoll2 {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+</style>
+</head>
+<body>
+
+<div id="day-night-overlay"></div>
+<div id="beijing-clock">
+  <div class="clock-label">北京时间 · Beijing</div>
+  <div class="clock-time" id="bj-time">--:--:--</div>
+  <div class="clock-date" id="bj-date">----/--/--</div>
+</div>
+
+<canvas id="galaxy-bg"></canvas>
+
+<!-- ── OCEAN SCENE (day only) ── -->
+<div id="ocean-scene">
+  <svg width="100%" height="100%" viewBox="0 0 1400 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Beach sand gradient -->
+      <linearGradient id="beachGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%"  stop-color="#f0d9a0"/>
+        <stop offset="55%" stop-color="#e8cc88"/>
+        <stop offset="100%" stop-color="#d4b870"/>
+      </linearGradient>
+      <!-- Ocean gradient (deep → shore) -->
+      <linearGradient id="oceanGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%"   stop-color="#2a8fd0"/>
+        <stop offset="40%"  stop-color="#41b3e8"/>
+        <stop offset="80%"  stop-color="#6ecce8"/>
+        <stop offset="100%" stop-color="#9adaf0"/>
+      </linearGradient>
+      <!-- Foam/surf edge -->
+      <linearGradient id="foamGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%"  stop-color="rgba(255,255,255,0.9)"/>
+        <stop offset="100%" stop-color="rgba(200,240,255,0.3)"/>
+      </linearGradient>
+    </defs>
+
+    <!-- Deep ocean fill -->
+    <rect x="0" y="0" width="1400" height="320" fill="url(#oceanGrad)"/>
+
+    <!-- Animated wave layer 1 (dark blue) — scrolls right to left -->
+    <g style="animation: waveRoll 8s linear infinite;">
+      <path d="M0,160 Q87,140 175,160 Q262,180 350,160 Q437,140 525,160 Q612,180 700,160 Q787,140 875,160 Q962,180 1050,160 Q1137,140 1225,160 Q1312,180 1400,160
+               L1400,0 L0,0 Z" fill="rgba(30,100,180,0.25)"/>
+      <!-- mirror tile for seamless scroll -->
+      <path d="M1400,160 Q1487,140 1575,160 Q1662,180 1750,160 Q1837,140 1925,160 Q2012,180 2100,160 Q2187,140 2275,160 Q2362,180 2450,160 Q2537,140 2625,160 Q2712,180 2800,160
+               L2800,0 L1400,0 Z" fill="rgba(30,100,180,0.25)"/>
+    </g>
+
+    <!-- Animated wave layer 2 (mid) — scrolls left to right slightly slower -->
+    <g style="animation: waveRoll2 11s linear infinite;">
+      <path d="M-700,200 Q-612,178 -525,200 Q-437,222 -350,200 Q-262,178 -175,200 Q-87,222 0,200 Q87,178 175,200 Q262,222 350,200 Q437,178 525,200 Q612,222 700,200 Q787,178 875,200 Q962,222 1050,200 Q1137,178 1225,200 Q1312,222 1400,200
+               L1400,0 L-700,0 Z" fill="rgba(65,180,232,0.22)"/>
+    </g>
+
+    <!-- Animated wave layer 3 (light teal) -->
+    <g style="animation: waveRoll 14s linear infinite reverse;">
+      <path d="M0,240 Q105,216 210,240 Q315,264 420,240 Q525,216 630,240 Q735,264 840,240 Q945,216 1050,240 Q1155,264 1260,240 Q1365,216 1400,230
+               L1400,0 L0,0 Z" fill="rgba(110,210,235,0.18)"/>
+      <path d="M1400,240 Q1505,216 1610,240 Q1715,264 1820,240 Q1925,216 2030,240 Q2135,264 2240,240 Q2345,216 2450,240 Q2555,264 2660,240 Q2765,216 2800,230
+               L2800,0 L1400,0 Z" fill="rgba(110,210,235,0.18)"/>
+    </g>
+
+    <!-- Surf / foam edge at waterline -->
+    <g style="animation: waveRoll 6s linear infinite;">
+      <path d="M0,290 Q70,278 140,290 Q210,302 280,290 Q350,278 420,290 Q490,302 560,290 Q630,278 700,290 Q770,302 840,290 Q910,278 980,290 Q1050,302 1120,290 Q1190,278 1260,290 Q1330,302 1400,290
+               L1400,282 Q1330,294 1260,282 Q1190,270 1120,282 Q1050,294 980,282 Q910,270 840,282 Q770,294 700,282 Q630,270 560,282 Q490,294 420,282 Q350,270 280,282 Q210,294 140,282 Q70,270 0,282 Z" fill="url(#foamGrad)"/>
+      <path d="M1400,290 Q1470,278 1540,290 Q1610,302 1680,290 Q1750,278 1820,290 Q1890,302 1960,290 Q2030,278 2100,290 Q2170,302 2240,290 Q2310,278 2380,290 Q2450,302 2520,290 Q2590,278 2660,290 Q2730,302 2800,290
+               L2800,282 Q2730,294 2660,282 Q2590,270 2520,282 Q2450,294 2380,282 Q2310,270 2240,282 Q2170,294 2100,282 Q2030,270 1960,282 Q1890,294 1820,282 Q1750,270 1680,282 Q1610,294 1540,282 Q1470,270 1400,282 Z" fill="url(#foamGrad)"/>
+    </g>
+
+    <!-- Beach strip -->
+    <path d="M0,295 Q175,275 350,290 Q525,305 700,292 Q875,279 1050,293 Q1225,307 1400,295 L1400,600 L0,600 Z" fill="url(#beachGrad)"/>
+
+    <!-- Beach texture details (pebbles) -->
+    <ellipse cx="200" cy="360" rx="18" ry="5" fill="rgba(160,130,70,0.3)"/>
+    <ellipse cx="450" cy="390" rx="12" ry="3.5" fill="rgba(150,120,60,0.25)"/>
+    <ellipse cx="730" cy="350" rx="22" ry="6" fill="rgba(165,135,72,0.28)"/>
+    <ellipse cx="1000" cy="375" rx="16" ry="4.5" fill="rgba(155,125,65,0.3)"/>
+    <ellipse cx="1280" cy="345" rx="14" ry="4" fill="rgba(158,128,68,0.27)"/>
+
+    <!-- Light shimmer on water -->
+    <ellipse cx="300" cy="150" rx="80" ry="15" fill="rgba(255,255,255,0.12)">
+      <animate attributeName="opacity" values="0.12;0.22;0.12" dur="3s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="800" cy="100" rx="60" ry="10" fill="rgba(255,255,255,0.10)">
+      <animate attributeName="opacity" values="0.10;0.20;0.10" dur="4.5s" repeatCount="indefinite" begin="1.5s"/>
+    </ellipse>
+    <ellipse cx="1150" cy="180" rx="70" ry="12" fill="rgba(255,255,255,0.11)">
+      <animate attributeName="opacity" values="0.11;0.19;0.11" dur="3.8s" repeatCount="indefinite" begin="0.8s"/>
+    </ellipse>
+  </svg>
+</div>
+
+
+</div>
+
+<!-- ── COCONUT TREES (day only) ── -->
+<div class="coconut-tree" style="left:4%;bottom:8%;animation:palmSway 7s ease-in-out infinite;animation-delay:0s;">
+<svg width="72" height="178" viewBox="0 0 72 178" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+<defs>
+  <linearGradient id="tk1h" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#3d2e1a"/>
+    <stop offset="35%" stop-color="#6b5030"/>
+    <stop offset="65%" stop-color="#7a5c38"/>
+    <stop offset="100%" stop-color="#3d2e1a"/>
+  </linearGradient>
+  <linearGradient id="tk1v" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#5a4525"/>
+    <stop offset="100%" stop-color="#2a1e0e"/>
+  </linearGradient>
+</defs>
+<!-- trunk -->
+<path d="M37,176 Q35,107 40,62 Q37,39 37,32"
+  stroke="url(#tk1h)" stroke-width="6" fill="none" stroke-linecap="round"/>
+<path d="M37,176 Q35,107 40,62 Q37,39 37,32"
+  stroke="url(#tk1v)" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+<ellipse cx="37" cy="42" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="37" cy="58" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="37" cy="74" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="37" cy="90" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="37" cy="106" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="37" cy="122" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="37" cy="138" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="37" cy="154" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/>
+<ellipse cx="35" cy="37" rx="4" ry="4" fill="#8B6914" stroke="#5a4210" stroke-width="1"/><ellipse cx="37" cy="37" rx="4" ry="4" fill="#8B6914" stroke="#5a4210" stroke-width="1"/><ellipse cx="39" cy="37" rx="4" ry="4" fill="#8B6914" stroke="#5a4210" stroke-width="1"/>
+<path d="M37,32 Q22,22 -6,16" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="26" y1="28" x2="17" y2="31" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="26" y1="28" x2="21" y2="19" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="15" y1="24" x2="7" y2="27" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="15" y1="24" x2="10" y2="16" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="5" y1="20" x2="-3" y2="23" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="5" y1="20" x2="1" y2="13" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M37,32 Q27,17 1,2" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="28" y1="24" x2="18" y2="24" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="28" y1="24" x2="26" y2="14" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="19" y1="17" x2="10" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="19" y1="17" x2="17" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="10" y1="9" x2="2" y2="9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="10" y1="9" x2="9" y2="1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M37,32 Q34,14 13,-10" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="31" y1="22" x2="22" y2="19" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="31" y1="22" x2="33" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="25" y1="11" x2="17" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="25" y1="11" x2="27" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="19" y1="1" x2="11" y2="-2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="19" y1="1" x2="20" y2="-7" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M37,32 Q41,12 28,-16" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="35" y1="20" x2="27" y2="14" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="35" y1="20" x2="40" y2="11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="33" y1="8" x2="26" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="33" y1="8" x2="38" y2="0" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="31" y1="-4" x2="25" y2="-9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="31" y1="-4" x2="35" y2="-11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M37,32 Q47,13 46,-16" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="39" y1="20" x2="34" y2="11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="39" y1="20" x2="47" y2="14" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="41" y1="8" x2="36" y2="0" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="41" y1="8" x2="48" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="43" y1="-4" x2="39" y2="-11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="43" y1="-4" x2="49" y2="-9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M37,32 Q53,17 61,-10" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="43" y1="22" x2="41" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="43" y1="22" x2="52" y2="19" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="49" y1="11" x2="47" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="49" y1="11" x2="57" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="55" y1="1" x2="54" y2="-7" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="55" y1="1" x2="63" y2="-2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M37,32 Q56,23 73,2" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="46" y1="24" x2="48" y2="14" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="46" y1="24" x2="56" y2="24" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="55" y1="17" x2="57" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="55" y1="17" x2="64" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="64" y1="9" x2="65" y2="1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="64" y1="9" x2="72" y2="9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M37,32 Q57,29 80,16" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="48" y1="28" x2="53" y2="19" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="48" y1="28" x2="57" y2="31" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="59" y1="24" x2="64" y2="16" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="59" y1="24" x2="67" y2="27" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="69" y1="20" x2="73" y2="13" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="69" y1="20" x2="77" y2="23" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M37,32 Q55,36 81,32" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="48" y1="32" x2="56" y2="26" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="48" y1="32" x2="56" y2="38" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="59" y1="32" x2="66" y2="26" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="59" y1="32" x2="66" y2="38" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="70" y1="32" x2="76" y2="27" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="70" y1="32" x2="76" y2="37" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M37,32 Q51,41 77,47" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="47" y1="36" x2="56" y2="33" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="47" y1="36" x2="52" y2="45" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="57" y1="39" x2="65" y2="36" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="57" y1="39" x2="62" y2="47" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="67" y1="43" x2="75" y2="40" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="67" y1="43" x2="71" y2="50" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+</svg>
+</div>
+
+<div class="coconut-tree" style="left:13%;bottom:5%;animation:palmSway2 8.5s ease-in-out infinite;animation-delay:1s;">
+<svg width="58" height="142" viewBox="0 0 58 142" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+<defs>
+  <linearGradient id="tk2h" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#3d2e1a"/>
+    <stop offset="35%" stop-color="#6b5030"/>
+    <stop offset="65%" stop-color="#7a5c38"/>
+    <stop offset="100%" stop-color="#3d2e1a"/>
+  </linearGradient>
+  <linearGradient id="tk2v" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#5a4525"/>
+    <stop offset="100%" stop-color="#2a1e0e"/>
+  </linearGradient>
+</defs>
+<!-- trunk -->
+<path d="M30,140 Q29,85 32,50 Q30,31 30,26"
+  stroke="url(#tk2h)" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M30,140 Q29,85 32,50 Q30,31 30,26"
+  stroke="url(#tk2v)" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
+<ellipse cx="30" cy="36" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="30" cy="49" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="30" cy="62" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="30" cy="75" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="30" cy="88" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="30" cy="101" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="30" cy="114" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="30" cy="127" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/>
+<ellipse cx="28" cy="30" rx="3" ry="3" fill="#8B6914" stroke="#5a4210" stroke-width="1"/><ellipse cx="30" cy="30" rx="3" ry="3" fill="#8B6914" stroke="#5a4210" stroke-width="1"/><ellipse cx="32" cy="30" rx="3" ry="3" fill="#8B6914" stroke="#5a4210" stroke-width="1"/>
+<path d="M30,26 Q18,18 -4,14" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="22" y1="23" x2="14" y2="26" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="22" y1="23" x2="18" y2="16" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="13" y1="20" x2="6" y2="22" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="13" y1="20" x2="10" y2="14" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="5" y1="17" x2="-1" y2="19" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="5" y1="17" x2="2" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M30,26 Q22,14 1,2" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="23" y1="20" x2="15" y2="20" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="23" y1="20" x2="22" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="15" y1="14" x2="8" y2="14" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="15" y1="14" x2="14" y2="7" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="8" y1="8" x2="2" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="8" y1="8" x2="7" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M30,26 Q27,11 11,-7" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="25" y1="18" x2="17" y2="15" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="25" y1="18" x2="26" y2="10" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="20" y1="10" x2="13" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="20" y1="10" x2="21" y2="3" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="16" y1="1" x2="10" y2="-1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="16" y1="1" x2="17" y2="-5" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M30,26 Q33,10 23,-13" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="28" y1="16" x2="22" y2="11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="28" y1="16" x2="32" y2="9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="27" y1="6" x2="22" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="27" y1="6" x2="30" y2="0" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="25" y1="-4" x2="20" y2="-8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="25" y1="-4" x2="28" y2="-9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M30,26 Q38,11 37,-13" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="32" y1="16" x2="28" y2="9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="32" y1="16" x2="38" y2="11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="33" y1="6" x2="30" y2="0" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="33" y1="6" x2="38" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="35" y1="-4" x2="32" y2="-9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="35" y1="-4" x2="40" y2="-8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M30,26 Q43,14 49,-7" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="35" y1="18" x2="34" y2="10" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="35" y1="18" x2="43" y2="15" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="40" y1="10" x2="39" y2="3" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="40" y1="10" x2="47" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="44" y1="1" x2="43" y2="-5" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="44" y1="1" x2="50" y2="-1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M30,26 Q45,18 59,2" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="37" y1="20" x2="38" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="37" y1="20" x2="45" y2="20" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="45" y1="14" x2="46" y2="7" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="45" y1="14" x2="52" y2="14" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="52" y1="8" x2="53" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="52" y1="8" x2="58" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M30,26 Q46,24 64,14" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="38" y1="23" x2="42" y2="16" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="38" y1="23" x2="46" y2="26" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="47" y1="20" x2="50" y2="14" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="47" y1="20" x2="54" y2="22" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="55" y1="17" x2="58" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="55" y1="17" x2="61" y2="19" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M30,26 Q44,29 66,26" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="39" y1="26" x2="45" y2="21" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="39" y1="26" x2="45" y2="31" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="48" y1="26" x2="53" y2="22" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="48" y1="26" x2="53" y2="30" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="57" y1="26" x2="62" y2="22" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="57" y1="26" x2="62" y2="30" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M30,26 Q41,33 62,38" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="38" y1="29" x2="46" y2="26" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="38" y1="29" x2="42" y2="36" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="46" y1="32" x2="53" y2="30" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="46" y1="32" x2="50" y2="38" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="54" y1="35" x2="60" y2="33" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="54" y1="35" x2="57" y2="40" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+</svg>
+</div>
+
+<div class="coconut-tree" style="left:21%;bottom:9%;animation:palmSway2 6.2s ease-in-out infinite;animation-delay:0.5s;">
+<svg width="45" height="110" viewBox="0 0 45 110" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+<defs>
+  <linearGradient id="tk3h" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#3d2e1a"/>
+    <stop offset="35%" stop-color="#6b5030"/>
+    <stop offset="65%" stop-color="#7a5c38"/>
+    <stop offset="100%" stop-color="#3d2e1a"/>
+  </linearGradient>
+  <linearGradient id="tk3v" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#5a4525"/>
+    <stop offset="100%" stop-color="#2a1e0e"/>
+  </linearGradient>
+</defs>
+<!-- trunk -->
+<path d="M23,108 Q22,66 25,38 Q23,24 23,20"
+  stroke="url(#tk3h)" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M23,108 Q22,66 25,38 Q23,24 23,20"
+  stroke="url(#tk3v)" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
+<ellipse cx="23" cy="30" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="23" cy="40" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="23" cy="50" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="23" cy="60" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="23" cy="70" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="23" cy="80" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="23" cy="90" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/>
+<ellipse cx="21" cy="23" rx="2" ry="2" fill="#8B6914" stroke="#5a4210" stroke-width="1"/><ellipse cx="23" cy="23" rx="2" ry="2" fill="#8B6914" stroke="#5a4210" stroke-width="1"/><ellipse cx="25" cy="23" rx="2" ry="2" fill="#8B6914" stroke="#5a4210" stroke-width="1"/>
+<path d="M23,20 Q14,14 -3,10" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="16" y1="18" x2="10" y2="20" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="16" y1="18" x2="13" y2="13" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="10" y1="15" x2="5" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="10" y1="15" x2="8" y2="11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="3" y1="13" x2="-2" y2="15" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="3" y1="13" x2="1" y2="9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M23,20 Q17,11 1,1" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="17" y1="15" x2="11" y2="15" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="17" y1="15" x2="16" y2="9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="12" y1="11" x2="7" y2="11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="12" y1="11" x2="11" y2="6" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="6" y1="6" x2="1" y2="6" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="6" y1="6" x2="5" y2="1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M23,20 Q21,8 8,-6" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="19" y1="14" x2="13" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="19" y1="14" x2="20" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="16" y1="7" x2="11" y2="5" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="16" y1="7" x2="17" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="12" y1="1" x2="7" y2="-1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="12" y1="1" x2="13" y2="-4" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M23,20 Q25,7 18,-11" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="22" y1="12" x2="17" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="22" y1="12" x2="25" y2="7" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="20" y1="5" x2="16" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="20" y1="5" x2="22" y2="1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="19" y1="-3" x2="15" y2="-6" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="19" y1="-3" x2="22" y2="-7" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M23,20 Q30,8 28,-11" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="24" y1="12" x2="21" y2="7" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="24" y1="12" x2="29" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="26" y1="5" x2="24" y2="1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="26" y1="5" x2="30" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="27" y1="-3" x2="24" y2="-7" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="27" y1="-3" x2="31" y2="-6" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M23,20 Q33,11 38,-6" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="27" y1="14" x2="26" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="27" y1="14" x2="33" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="30" y1="7" x2="29" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="30" y1="7" x2="35" y2="5" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="34" y1="1" x2="33" y2="-4" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="34" y1="1" x2="39" y2="-1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M23,20 Q35,14 45,1" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="29" y1="15" x2="30" y2="9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="29" y1="15" x2="35" y2="15" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="34" y1="11" x2="35" y2="6" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="34" y1="11" x2="39" y2="11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="40" y1="6" x2="41" y2="1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="40" y1="6" x2="45" y2="6" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M23,20 Q35,18 49,10" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="30" y1="18" x2="33" y2="13" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="30" y1="18" x2="36" y2="20" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="36" y1="15" x2="38" y2="11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="36" y1="15" x2="41" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="43" y1="13" x2="46" y2="9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="43" y1="13" x2="48" y2="15" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M23,20 Q34,22 51,20" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="30" y1="20" x2="35" y2="16" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="30" y1="20" x2="35" y2="24" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="37" y1="20" x2="41" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="37" y1="20" x2="41" y2="23" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="44" y1="20" x2="48" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="44" y1="20" x2="48" y2="23" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M23,20 Q32,26 48,29" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="29" y1="22" x2="35" y2="20" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="29" y1="22" x2="32" y2="27" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="36" y1="25" x2="41" y2="23" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="36" y1="25" x2="38" y2="29" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="42" y1="27" x2="47" y2="25" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="42" y1="27" x2="44" y2="31" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+</svg>
+</div>
+
+<div class="coconut-tree" style="right:4%;bottom:7%;animation:palmSway 9s ease-in-out infinite;animation-delay:0.8s;">
+<svg width="90" height="220" viewBox="0 0 90 220" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+<defs>
+  <linearGradient id="tk4h" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#3d2e1a"/>
+    <stop offset="35%" stop-color="#6b5030"/>
+    <stop offset="65%" stop-color="#7a5c38"/>
+    <stop offset="100%" stop-color="#3d2e1a"/>
+  </linearGradient>
+  <linearGradient id="tk4v" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#5a4525"/>
+    <stop offset="100%" stop-color="#2a1e0e"/>
+  </linearGradient>
+</defs>
+<!-- trunk -->
+<path d="M47,218 Q45,132 50,77 Q47,48 47,40"
+  stroke="url(#tk4h)" stroke-width="8" fill="none" stroke-linecap="round"/>
+<path d="M47,218 Q45,132 50,77 Q47,48 47,40"
+  stroke="url(#tk4v)" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+<ellipse cx="47" cy="50" rx="5" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="47" cy="70" rx="5" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="47" cy="90" rx="5" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="47" cy="110" rx="5" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="47" cy="130" rx="5" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="47" cy="150" rx="5" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="47" cy="170" rx="5" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="47" cy="190" rx="5" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/>
+<ellipse cx="44" cy="47" rx="4" ry="4" fill="#8B6914" stroke="#5a4210" stroke-width="1"/><ellipse cx="47" cy="47" rx="4" ry="4" fill="#8B6914" stroke="#5a4210" stroke-width="1"/><ellipse cx="50" cy="47" rx="4" ry="4" fill="#8B6914" stroke="#5a4210" stroke-width="1"/>
+<path d="M47,40 Q29,28 -7,21" stroke="#2d5a1b" stroke-width="2" fill="none" stroke-linecap="round"/>
+<line x1="34" y1="35" x2="23" y2="39" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="34" y1="35" x2="28" y2="25" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="20" y1="30" x2="10" y2="34" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="20" y1="30" x2="14" y2="20" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="7" y1="25" x2="-1" y2="28" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="7" y1="25" x2="3" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M47,40 Q35,22 3,3" stroke="#356620" stroke-width="2" fill="none" stroke-linecap="round"/>
+<line x1="36" y1="31" x2="24" y2="31" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="36" y1="31" x2="34" y2="19" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="25" y1="21" x2="14" y2="21" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="25" y1="21" x2="23" y2="10" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="14" y1="12" x2="5" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="14" y1="12" x2="12" y2="3" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M47,40 Q43,17 17,-12" stroke="#3d7524" stroke-width="2" fill="none" stroke-linecap="round"/>
+<line x1="40" y1="27" x2="29" y2="23" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="40" y1="27" x2="42" y2="15" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="32" y1="14" x2="22" y2="10" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="32" y1="14" x2="34" y2="3" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="25" y1="1" x2="17" y2="-2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="25" y1="1" x2="27" y2="-8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M47,40 Q52,15 36,-20" stroke="#2d5a1b" stroke-width="2" fill="none" stroke-linecap="round"/>
+<line x1="44" y1="25" x2="35" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="44" y1="25" x2="50" y2="15" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="42" y1="10" x2="34" y2="3" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="42" y1="10" x2="48" y2="0" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="39" y1="-5" x2="32" y2="-11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="39" y1="-5" x2="44" y2="-13" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M47,40 Q60,17 58,-20" stroke="#3d7524" stroke-width="2" fill="none" stroke-linecap="round"/>
+<line x1="50" y1="25" x2="44" y2="15" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="50" y1="25" x2="59" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="52" y1="10" x2="46" y2="0" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="52" y1="10" x2="60" y2="3" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="55" y1="-5" x2="50" y2="-13" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="55" y1="-5" x2="62" y2="-11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M47,40 Q67,21 77,-12" stroke="#356620" stroke-width="2" fill="none" stroke-linecap="round"/>
+<line x1="54" y1="27" x2="52" y2="15" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="54" y1="27" x2="65" y2="23" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="62" y1="14" x2="60" y2="3" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="62" y1="14" x2="72" y2="10" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="70" y1="1" x2="68" y2="-8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="70" y1="1" x2="78" y2="-2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M47,40 Q71,29 91,3" stroke="#2d5a1b" stroke-width="2" fill="none" stroke-linecap="round"/>
+<line x1="58" y1="31" x2="60" y2="19" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="58" y1="31" x2="70" y2="31" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="69" y1="21" x2="71" y2="10" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="69" y1="21" x2="80" y2="21" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="80" y1="12" x2="82" y2="3" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="80" y1="12" x2="89" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M47,40 Q71,36 101,21" stroke="#3d7524" stroke-width="2" fill="none" stroke-linecap="round"/>
+<line x1="60" y1="35" x2="66" y2="25" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="60" y1="35" x2="71" y2="39" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="74" y1="30" x2="80" y2="20" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="74" y1="30" x2="84" y2="34" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="87" y1="25" x2="92" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="87" y1="25" x2="95" y2="28" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M47,40 Q69,44 102,40" stroke="#356620" stroke-width="2" fill="none" stroke-linecap="round"/>
+<line x1="61" y1="40" x2="70" y2="32" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="61" y1="40" x2="70" y2="48" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="74" y1="40" x2="82" y2="33" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="74" y1="40" x2="82" y2="47" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="88" y1="40" x2="95" y2="34" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="88" y1="40" x2="95" y2="46" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M47,40 Q64,51 97,58" stroke="#2d5a1b" stroke-width="2" fill="none" stroke-linecap="round"/>
+<line x1="59" y1="45" x2="70" y2="41" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="59" y1="45" x2="65" y2="55" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="72" y1="49" x2="82" y2="45" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="72" y1="49" x2="78" y2="59" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="84" y1="54" x2="92" y2="51" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="84" y1="54" x2="88" y2="62" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+</svg>
+</div>
+
+<div class="coconut-tree" style="right:14%;bottom:5%;animation:palmSway2 5.5s ease-in-out infinite;animation-delay:1.5s;">
+<svg width="65" height="160" viewBox="0 0 65 160" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+<defs>
+  <linearGradient id="tk5h" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#3d2e1a"/>
+    <stop offset="35%" stop-color="#6b5030"/>
+    <stop offset="65%" stop-color="#7a5c38"/>
+    <stop offset="100%" stop-color="#3d2e1a"/>
+  </linearGradient>
+  <linearGradient id="tk5v" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#5a4525"/>
+    <stop offset="100%" stop-color="#2a1e0e"/>
+  </linearGradient>
+</defs>
+<!-- trunk -->
+<path d="M34,158 Q32,96 36,56 Q34,35 34,29"
+  stroke="url(#tk5h)" stroke-width="6" fill="none" stroke-linecap="round"/>
+<path d="M34,158 Q32,96 36,56 Q34,35 34,29"
+  stroke="url(#tk5v)" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
+<ellipse cx="34" cy="39" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="34" cy="54" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="34" cy="69" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="34" cy="84" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="34" cy="99" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="34" cy="114" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="34" cy="129" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="34" cy="144" rx="4" ry="2" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/>
+<ellipse cx="32" cy="34" rx="3" ry="3" fill="#8B6914" stroke="#5a4210" stroke-width="1"/><ellipse cx="34" cy="34" rx="3" ry="3" fill="#8B6914" stroke="#5a4210" stroke-width="1"/><ellipse cx="36" cy="34" rx="3" ry="3" fill="#8B6914" stroke="#5a4210" stroke-width="1"/>
+<path d="M34,29 Q21,20 -5,15" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="24" y1="25" x2="16" y2="28" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="24" y1="25" x2="20" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="15" y1="22" x2="7" y2="25" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="15" y1="22" x2="11" y2="15" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="5" y1="18" x2="-2" y2="20" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="5" y1="18" x2="2" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M34,29 Q25,16 2,2" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="26" y1="22" x2="17" y2="22" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="26" y1="22" x2="24" y2="13" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="18" y1="16" x2="10" y2="16" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="18" y1="16" x2="17" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="10" y1="9" x2="3" y2="9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="10" y1="9" x2="9" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M34,29 Q31,12 13,-8" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="29" y1="20" x2="21" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="29" y1="20" x2="31" y2="11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="23" y1="10" x2="15" y2="7" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="23" y1="10" x2="24" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="18" y1="1" x2="11" y2="-1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="18" y1="1" x2="19" y2="-6" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M34,29 Q37,11 26,-14" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="32" y1="18" x2="25" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="32" y1="18" x2="36" y2="10" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="30" y1="7" x2="24" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="30" y1="7" x2="34" y2="0" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="28" y1="-3" x2="23" y2="-7" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="28" y1="-3" x2="32" y2="-9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M34,29 Q44,12 42,-14" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="36" y1="18" x2="32" y2="10" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="36" y1="18" x2="43" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="38" y1="7" x2="34" y2="0" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="38" y1="7" x2="44" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="40" y1="-3" x2="36" y2="-9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="40" y1="-3" x2="45" y2="-7" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M34,29 Q48,16 56,-8" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="39" y1="20" x2="37" y2="11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="39" y1="20" x2="47" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="45" y1="10" x2="44" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="45" y1="10" x2="53" y2="7" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="50" y1="1" x2="49" y2="-6" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="50" y1="1" x2="57" y2="-1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M34,29 Q51,21 66,2" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="42" y1="22" x2="44" y2="13" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="42" y1="22" x2="51" y2="22" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="50" y1="16" x2="51" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="50" y1="16" x2="58" y2="16" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="58" y1="9" x2="59" y2="2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="58" y1="9" x2="65" y2="9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M34,29 Q52,26 73,15" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="44" y1="25" x2="48" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="44" y1="25" x2="52" y2="28" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="53" y1="22" x2="57" y2="15" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="53" y1="22" x2="61" y2="25" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="63" y1="18" x2="66" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="63" y1="18" x2="70" y2="20" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M34,29 Q50,32 74,29" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="44" y1="29" x2="51" y2="23" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="44" y1="29" x2="51" y2="35" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="54" y1="29" x2="60" y2="24" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="54" y1="29" x2="60" y2="34" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="64" y1="29" x2="69" y2="25" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="64" y1="29" x2="69" y2="33" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M34,29 Q46,37 71,42" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="43" y1="32" x2="51" y2="29" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="43" y1="32" x2="48" y2="40" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="52" y1="36" x2="60" y2="33" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="52" y1="36" x2="56" y2="43" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="61" y1="39" x2="68" y2="37" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="61" y1="39" x2="64" y2="45" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+</svg>
+</div>
+
+<div class="coconut-tree" style="right:22%;bottom:9%;animation:palmSway 6.5s ease-in-out infinite;animation-delay:0.3s;">
+<svg width="48" height="118" viewBox="0 0 48 118" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+<defs>
+  <linearGradient id="tk6h" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#3d2e1a"/>
+    <stop offset="35%" stop-color="#6b5030"/>
+    <stop offset="65%" stop-color="#7a5c38"/>
+    <stop offset="100%" stop-color="#3d2e1a"/>
+  </linearGradient>
+  <linearGradient id="tk6v" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#5a4525"/>
+    <stop offset="100%" stop-color="#2a1e0e"/>
+  </linearGradient>
+</defs>
+<!-- trunk -->
+<path d="M25,116 Q24,71 27,41 Q25,26 25,21"
+  stroke="url(#tk6h)" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M25,116 Q24,71 27,41 Q25,26 25,21"
+  stroke="url(#tk6v)" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
+<ellipse cx="25" cy="31" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="25" cy="42" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="25" cy="53" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="25" cy="64" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="25" cy="75" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="25" cy="86" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/><ellipse cx="25" cy="97" rx="3" ry="1" fill="none" stroke="#4a3520" stroke-width="1" opacity="0.5"/>
+<ellipse cx="23" cy="25" rx="2" ry="2" fill="#8B6914" stroke="#5a4210" stroke-width="1"/><ellipse cx="25" cy="25" rx="2" ry="2" fill="#8B6914" stroke="#5a4210" stroke-width="1"/><ellipse cx="27" cy="25" rx="2" ry="2" fill="#8B6914" stroke="#5a4210" stroke-width="1"/>
+<path d="M25,21 Q15,15 -3,11" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="18" y1="18" x2="12" y2="20" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="18" y1="18" x2="15" y2="13" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="11" y1="16" x2="5" y2="18" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="11" y1="16" x2="8" y2="11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="4" y1="13" x2="-1" y2="15" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="4" y1="13" x2="2" y2="9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M25,21 Q19,11 1,1" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="19" y1="16" x2="13" y2="16" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="19" y1="16" x2="18" y2="10" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="13" y1="11" x2="7" y2="11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="13" y1="11" x2="12" y2="5" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="7" y1="6" x2="2" y2="6" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="7" y1="6" x2="6" y2="1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M25,21 Q23,9 9,-7" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="21" y1="14" x2="15" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="21" y1="14" x2="22" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="17" y1="7" x2="11" y2="5" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="17" y1="7" x2="18" y2="1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="13" y1="0" x2="8" y2="-2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="13" y1="0" x2="14" y2="-5" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M25,21 Q27,8 19,-11" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="24" y1="13" x2="19" y2="9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="24" y1="13" x2="27" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="22" y1="5" x2="17" y2="1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="22" y1="5" x2="25" y2="0" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="21" y1="-3" x2="17" y2="-6" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="21" y1="-3" x2="24" y2="-7" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M25,21 Q32,8 31,-11" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="26" y1="13" x2="23" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="26" y1="13" x2="31" y2="9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="28" y1="5" x2="25" y2="0" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="28" y1="5" x2="33" y2="1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="29" y1="-3" x2="26" y2="-7" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="29" y1="-3" x2="33" y2="-6" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M25,21 Q36,11 41,-7" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="29" y1="14" x2="28" y2="8" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="29" y1="14" x2="35" y2="12" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="33" y1="7" x2="32" y2="1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="33" y1="7" x2="39" y2="5" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="37" y1="0" x2="36" y2="-5" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="37" y1="0" x2="42" y2="-2" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M25,21 Q38,15 49,1" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="31" y1="16" x2="32" y2="10" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="31" y1="16" x2="37" y2="16" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="37" y1="11" x2="38" y2="5" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="37" y1="11" x2="43" y2="11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="43" y1="6" x2="44" y2="1" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="43" y1="6" x2="48" y2="6" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M25,21 Q38,19 53,11" stroke="#3d7524" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="32" y1="18" x2="35" y2="13" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="32" y1="18" x2="38" y2="20" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="39" y1="16" x2="42" y2="11" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="39" y1="16" x2="45" y2="18" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="46" y1="13" x2="48" y2="9" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="46" y1="13" x2="51" y2="15" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M25,21 Q37,23 54,21" stroke="#356620" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="32" y1="21" x2="37" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="32" y1="21" x2="37" y2="25" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="40" y1="21" x2="45" y2="17" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="40" y1="21" x2="45" y2="25" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="47" y1="21" x2="51" y2="18" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="47" y1="21" x2="51" y2="24" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<path d="M25,21 Q34,27 51,31" stroke="#2d5a1b" stroke-width="1" fill="none" stroke-linecap="round"/>
+<line x1="32" y1="23" x2="38" y2="21" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="32" y1="23" x2="35" y2="28" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="38" y1="26" x2="44" y2="24" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="38" y1="26" x2="41" y2="31" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="45" y1="28" x2="50" y2="26" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+<line x1="45" y1="28" x2="48" y2="32" stroke="#2d6618" stroke-width="1" stroke-linecap="round"/>
+</svg>
+</div>
+
+<!-- Day clouds -->
+<div class="day-cloud" style="top:12%;left:8%;"><svg width="100" height="38" viewBox="0 0 100 38"><ellipse cx="50" cy="28" rx="44" ry="14" fill="rgba(255,255,255,0.85)"/><ellipse cx="32" cy="22" rx="22" ry="16" fill="rgba(255,255,255,0.85)"/><ellipse cx="68" cy="20" rx="20" ry="15" fill="rgba(255,255,255,0.85)"/></svg></div>
+<div class="day-cloud" style="top:8%;right:12%;"><svg width="80" height="30" viewBox="0 0 80 30"><ellipse cx="40" cy="22" rx="34" ry="11" fill="rgba(255,255,255,0.8)"/><ellipse cx="25" cy="17" rx="18" ry="13" fill="rgba(255,255,255,0.8)"/><ellipse cx="55" cy="15" rx="16" ry="12" fill="rgba(255,255,255,0.8)"/></svg></div>
+<div class="day-cloud" style="top:22%;left:55%;"><svg width="65" height="25" viewBox="0 0 65 25"><ellipse cx="32" cy="18" rx="28" ry="10" fill="rgba(255,255,255,0.75)"/><ellipse cx="20" cy="14" rx="15" ry="11" fill="rgba(255,255,255,0.75)"/><ellipse cx="46" cy="12" rx="13" ry="10" fill="rgba(255,255,255,0.75)"/></svg></div>
+
+<!-- Meteors -->
+<div class="meteor" style="top:10%;left:20%;animation-duration:4s;animation-delay:0s;"></div>
+<div class="meteor" style="top:5%;left:60%;animation-duration:6s;animation-delay:3s;"></div>
+<div class="meteor" style="top:30%;left:5%;animation-duration:5s;animation-delay:7s;"></div>
+
+<!-- ── ASTEROIDS: far=small(top), near=large(bottom) ── -->
+<!-- LEFT col: top→bottom = far→near = small→large -->
+
+<!-- L1: top 14% — very far, 13px -->
+<div class="asteroid" style="top:14%;left:24%;animation-name:asteroidDriftLeft3,asteroidFloat;animation-duration:4s,5.5s;">
+  <svg width="13" height="11" viewBox="0 0 28 22"><defs><radialGradient id="ag1" cx="30%" cy="28%" r="70%"><stop offset="0%" stop-color="#d0d4d8"/><stop offset="50%" stop-color="#7a7e84"/><stop offset="100%" stop-color="#3a3d42"/></radialGradient></defs><polygon points="8,2 20,0 27,6 25,16 18,22 6,20 0,13 3,5" fill="url(#ag1)"/><ellipse cx="10" cy="8" rx="4" ry="3" fill="rgba(0,0,0,0.18)"/></svg>
+</div>
+
+<!-- L2: top 24% — far, 18px -->
+<div class="asteroid" style="top:24%;left:12%;animation-name:asteroidDriftRight4,asteroidFloat;animation-duration:3.5s,6.2s;animation-delay:0.8s,1.2s;">
+  <svg width="18" height="14" viewBox="0 0 28 22"><defs><radialGradient id="ag2" cx="32%" cy="30%" r="68%"><stop offset="0%" stop-color="#c8ccd0"/><stop offset="52%" stop-color="#828890"/><stop offset="100%" stop-color="#404448"/></radialGradient></defs><polygon points="8,2 20,0 27,6 25,16 18,22 6,20 0,13 3,5" fill="url(#ag2)"/><ellipse cx="8" cy="7" rx="3" ry="2.2" fill="rgba(0,0,0,0.16)"/><ellipse cx="18" cy="14" rx="2.5" ry="1.8" fill="rgba(0,0,0,0.12)"/></svg>
+</div>
+
+<!-- L3: top 40% — mid, 36px -->
+<div class="asteroid" style="top:40%;left:8%;animation-name:asteroidDriftLeft4,asteroidFloat;animation-duration:5s,7s;animation-delay:0.5s,2s;">
+  <svg width="36" height="29" viewBox="0 0 44 36"><defs><radialGradient id="ag3" cx="30%" cy="27%" r="70%"><stop offset="0%" stop-color="#c2c8ce"/><stop offset="45%" stop-color="#6c7278"/><stop offset="100%" stop-color="#363a3f"/></radialGradient></defs><polygon points="12,2 28,0 40,8 42,20 34,33 16,36 4,28 0,15 5,5" fill="url(#ag3)"/><ellipse cx="15" cy="12" rx="6" ry="4" fill="rgba(0,0,0,0.2)"/><ellipse cx="30" cy="22" rx="5" ry="3.5" fill="rgba(0,0,0,0.15)"/><ellipse cx="24" cy="7" rx="2.5" ry="2" fill="rgba(255,255,255,0.1)"/></svg>
+</div>
+
+<!-- L4: top 54% — near, 56px -->
+<div class="asteroid" style="top:54%;left:5%;animation-name:asteroidDriftRight3,asteroidFloat;animation-duration:6s,8.5s;animation-delay:1.5s,0.5s;">
+  <svg width="56" height="48" viewBox="0 0 60 52"><defs><radialGradient id="ag4" cx="28%" cy="25%" r="72%"><stop offset="0%" stop-color="#c8cdd3"/><stop offset="40%" stop-color="#72787e"/><stop offset="100%" stop-color="#323538"/></radialGradient></defs><polygon points="16,3 36,0 52,8 58,24 54,40 38,52 18,50 5,40 0,22 7,8" fill="url(#ag4)"/><ellipse cx="20" cy="16" rx="8" ry="5.5" fill="rgba(0,0,0,0.22)"/><ellipse cx="40" cy="30" rx="7" ry="5" fill="rgba(0,0,0,0.18)"/><ellipse cx="46" cy="15" rx="4" ry="3" fill="rgba(255,255,255,0.09)"/><ellipse cx="28" cy="44" rx="3" ry="2" fill="rgba(255,255,255,0.07)"/></svg>
+</div>
+
+<!-- L5: top 78% — very near, 74px -->
+<div class="asteroid" style="top:78%;left:9%;animation-name:asteroidDriftLeft3,asteroidFloat;animation-duration:4.5s,6s;animation-delay:2s,1s;">
+  <svg width="74" height="62" viewBox="0 0 60 52"><defs><radialGradient id="ag5" cx="27%" cy="24%" r="73%"><stop offset="0%" stop-color="#caced2"/><stop offset="42%" stop-color="#787e84"/><stop offset="100%" stop-color="#2e3236"/></radialGradient></defs><polygon points="16,3 36,0 52,8 58,24 54,40 38,52 18,50 5,40 0,22 7,8" fill="url(#ag5)"/><ellipse cx="18" cy="14" rx="9" ry="6" fill="rgba(0,0,0,0.23)"/><ellipse cx="38" cy="28" rx="8" ry="5.5" fill="rgba(0,0,0,0.18)"/><ellipse cx="12" cy="34" rx="5" ry="3.5" fill="rgba(0,0,0,0.13)"/><ellipse cx="44" cy="13" rx="4" ry="3" fill="rgba(255,255,255,0.1)"/></svg>
+</div>
+
+<!-- RIGHT col: top→bottom = far→near = small→large -->
+
+<!-- R1: top 14% right — very far, 12px -->
+<div class="asteroid" style="top:14%;right:21%;animation-name:asteroidDriftRight4,asteroidFloat;animation-duration:3.8s,5.2s;animation-delay:0.3s,0.8s;">
+  <svg width="12" height="10" viewBox="0 0 24 19"><defs><radialGradient id="ag6" cx="31%" cy="29%" r="69%"><stop offset="0%" stop-color="#d2d6da"/><stop offset="55%" stop-color="#808488"/><stop offset="100%" stop-color="#3e4245"/></radialGradient></defs><polygon points="6,1 16,0 22,5 21,13 14,19 5,17 0,10 2,3" fill="url(#ag6)"/><ellipse cx="9" cy="7" rx="3" ry="2" fill="rgba(0,0,0,0.17)"/></svg>
+</div>
+
+<!-- R2: top 28% right — far-mid, 28px -->
+<div class="asteroid" style="top:28%;right:11%;animation-name:asteroidDriftLeft3,asteroidFloat;animation-duration:5.2s,7.4s;animation-delay:1s,2.5s;">
+  <svg width="28" height="23" viewBox="0 0 42 34"><defs><radialGradient id="ag7" cx="30%" cy="27%" r="70%"><stop offset="0%" stop-color="#c4cace"/><stop offset="48%" stop-color="#6e7478"/><stop offset="100%" stop-color="#363a3e"/></radialGradient></defs><polygon points="11,2 26,0 38,7 40,19 33,31 15,34 4,26 0,14 4,5" fill="url(#ag7)"/><ellipse cx="14" cy="11" rx="5" ry="3.5" fill="rgba(0,0,0,0.2)"/><ellipse cx="28" cy="22" rx="4.5" ry="3" fill="rgba(0,0,0,0.15)"/></svg>
+</div>
+
+<!-- R3: top 52% right — near, 52px -->
+<div class="asteroid" style="top:52%;right:24%;animation-name:asteroidDriftRight3,asteroidFloat;animation-duration:6.5s,9s;animation-delay:0.6s,1.8s;">
+  <svg width="52" height="44" viewBox="0 0 56 48"><defs><radialGradient id="ag8" cx="27%" cy="24%" r="73%"><stop offset="0%" stop-color="#cad0d6"/><stop offset="42%" stop-color="#747a80"/><stop offset="100%" stop-color="#343840"/></radialGradient></defs><polygon points="14,2 34,0 50,9 55,24 50,40 34,48 14,46 4,36 0,20 6,8" fill="url(#ag8)"/><ellipse cx="18" cy="14" rx="8" ry="5" fill="rgba(0,0,0,0.21)"/><ellipse cx="38" cy="28" rx="7" ry="5" fill="rgba(0,0,0,0.17)"/><ellipse cx="42" cy="13" rx="4" ry="3" fill="rgba(255,255,255,0.09)"/></svg>
+</div>
+
+<!-- R4: top 70% right — near-large, 68px -->
+<div class="asteroid" style="top:70%;right:13%;animation-name:asteroidDriftLeft4,asteroidFloat;animation-duration:5.8s,7.8s;animation-delay:2.2s,0.4s;">
+  <svg width="68" height="58" viewBox="0 0 56 48"><defs><radialGradient id="ag9" cx="26%" cy="23%" r="74%"><stop offset="0%" stop-color="#ccd2d8"/><stop offset="44%" stop-color="#767c82"/><stop offset="100%" stop-color="#2e3238"/></radialGradient></defs><polygon points="14,2 34,0 50,9 55,24 50,40 34,48 14,46 4,36 0,20 6,8" fill="url(#ag9)"/><ellipse cx="16" cy="13" rx="9" ry="6" fill="rgba(0,0,0,0.22)"/><ellipse cx="36" cy="26" rx="8" ry="5.5" fill="rgba(0,0,0,0.17)"/><ellipse cx="10" cy="30" rx="5" ry="3.5" fill="rgba(0,0,0,0.13)"/><ellipse cx="44" cy="14" rx="4" ry="3" fill="rgba(255,255,255,0.09)"/></svg>
+</div>
+
+<!-- R5: top 83% right — very near, 84px -->
+<div class="asteroid" style="top:83%;right:9%;animation-name:asteroidDriftRight4,asteroidFloat;animation-duration:4.8s,6.8s;animation-delay:1.2s,3s;">
+  <svg width="84" height="72" viewBox="0 0 66 58"><defs><radialGradient id="ag10" cx="25%" cy="22%" r="75%"><stop offset="0%" stop-color="#d0d6dc"/><stop offset="40%" stop-color="#70767c"/><stop offset="100%" stop-color="#28303a"/></radialGradient></defs><polygon points="18,2 40,0 58,10 64,28 58,46 40,58 18,56 6,44 0,26 6,10" fill="url(#ag10)"/><ellipse cx="22" cy="16" rx="10" ry="7" fill="rgba(0,0,0,0.24)"/><ellipse cx="44" cy="34" rx="9" ry="6.5" fill="rgba(0,0,0,0.19)"/><ellipse cx="14" cy="38" rx="6" ry="4.5" fill="rgba(0,0,0,0.14)"/><ellipse cx="50" cy="17" rx="5" ry="3.5" fill="rgba(255,255,255,0.09)"/><ellipse cx="32" cy="52" rx="4" ry="3" fill="rgba(255,255,255,0.07)"/></svg>
+</div>
+
+<!-- ── SATELLITES (near asteroids) ── -->
+<!-- Near left-top asteroid -->
+<div class="satellite" style="top:10%;left:30%;animation-name:satDriftRight3,satOrbit;animation-duration:3s,8s;animation-delay:0.4s,0s;">
+  <svg width="30" height="16" viewBox="0 0 30 16"><rect x="12" y="5" width="6" height="6" rx="1" fill="#c8ccd2" stroke="#a0a4a8" stroke-width="0.5"/><rect x="0" y="6" width="10" height="4" rx="1" fill="#6a8fcc" opacity="0.9"/><rect x="20" y="6" width="10" height="4" rx="1" fill="#6a8fcc" opacity="0.9"/><rect x="14" y="0" width="2" height="4" rx="0.5" fill="#909498"/><rect x="14" y="12" width="2" height="4" rx="0.5" fill="#909498"/><circle cx="15" cy="8" r="1.5" fill="#ffd700" opacity="0.9"/></svg>
+</div>
+<!-- Near left-medium asteroid -->
+<div class="satellite" style="top:38%;left:16%;animation-name:satDriftLeft2,satOrbit;animation-duration:4s,10s;animation-delay:1s,2s;">
+  <svg width="38" height="20" viewBox="0 0 38 20"><rect x="15" y="6" width="8" height="8" rx="1.5" fill="#b8bcc2" stroke="#909498" stroke-width="0.6"/><rect x="0" y="7" width="13" height="6" rx="1" fill="#5a7fbc" opacity="0.88"/><rect x="25" y="7" width="13" height="6" rx="1" fill="#5a7fbc" opacity="0.88"/><rect x="18" y="0" width="2.5" height="5" rx="0.8" fill="#808488"/><rect x="18" y="15" width="2.5" height="5" rx="0.8" fill="#808488"/><circle cx="19" cy="10" r="2" fill="#ffd700" opacity="0.85"/><circle cx="7" cy="10" r="1" fill="rgba(255,200,100,0.5)"/><circle cx="31" cy="10" r="1" fill="rgba(255,200,100,0.5)"/></svg>
+</div>
+<!-- Near left-large asteroid -->
+<div class="satellite" style="top:60%;left:14%;animation-name:satDriftRight3,satOrbit;animation-duration:3.5s,12s;animation-delay:0.2s,4s;">
+  <svg width="24" height="13" viewBox="0 0 24 13"><rect x="9" y="4" width="6" height="5" rx="1" fill="#cacecf" stroke="#9aa0a2" stroke-width="0.5"/><rect x="0" y="5" width="7" height="3" rx="0.8" fill="#7090c8" opacity="0.85"/><rect x="17" y="5" width="7" height="3" rx="0.8" fill="#7090c8" opacity="0.85"/><rect x="11" y="0" width="2" height="3.5" rx="0.5" fill="#8a9092"/><rect x="11" y="9.5" width="2" height="3.5" rx="0.5" fill="#8a9092"/></svg>
+</div>
+<!-- Near right-top asteroid -->
+<div class="satellite" style="top:11%;right:27%;animation-name:satDriftLeft3,satOrbit;animation-duration:3.2s,9s;animation-delay:0.7s,1.5s;">
+  <svg width="32" height="17" viewBox="0 0 32 17"><rect x="13" y="5" width="6" height="7" rx="1" fill="#c4c8cc" stroke="#a4a8ac" stroke-width="0.5"/><rect x="0" y="6" width="11" height="5" rx="1" fill="#6888c0" opacity="0.9"/><rect x="21" y="6" width="11" height="5" rx="1" fill="#6888c0" opacity="0.9"/><rect x="15" y="0" width="2" height="4" rx="0.5" fill="#8c9094"/><rect x="15" y="13" width="2" height="4" rx="0.5" fill="#8c9094"/><circle cx="16" cy="8.5" r="1.8" fill="#ffd700" opacity="0.88"/></svg>
+</div>
+<!-- Near right-medium asteroid -->
+<div class="satellite" style="top:34%;right:6%;animation-name:satDriftRight3,satOrbit;animation-duration:4.5s,11s;animation-delay:1.8s,3s;">
+  <svg width="42" height="22" viewBox="0 0 42 22"><rect x="16" y="7" width="10" height="8" rx="2" fill="#b6babe" stroke="#8e9296" stroke-width="0.6"/><rect x="0" y="8" width="14" height="6" rx="1.2" fill="#5878b4" opacity="0.88"/><rect x="28" y="8" width="14" height="6" rx="1.2" fill="#5878b4" opacity="0.88"/><rect x="20" y="0" width="3" height="6" rx="1" fill="#7a8082"/><rect x="20" y="16" width="3" height="6" rx="1" fill="#7a8082"/><circle cx="21" cy="11" r="2.2" fill="#ffd700" opacity="0.85"/><circle cx="8" cy="11" r="1.2" fill="rgba(255,200,100,0.45)"/><circle cx="34" cy="11" r="1.2" fill="rgba(255,200,100,0.45)"/></svg>
+</div>
+<!-- Near right-large asteroid -->
+<div class="satellite" style="top:63%;right:18%;animation-name:satDriftLeft2,satOrbit;animation-duration:3.8s,13s;animation-delay:0.9s,5s;">
+  <svg width="28" height="15" viewBox="0 0 28 15"><rect x="11" y="4" width="6" height="7" rx="1" fill="#c0c4c8" stroke="#9ea2a6" stroke-width="0.5"/><rect x="0" y="5" width="9" height="5" rx="1" fill="#6484bc" opacity="0.87"/><rect x="19" y="5" width="9" height="5" rx="1" fill="#6484bc" opacity="0.87"/><rect x="13" y="0" width="2" height="3.5" rx="0.5" fill="#868a8e"/><rect x="13" y="11.5" width="2" height="3.5" rx="0.5" fill="#868a8e"/></svg>
+</div>
+
+<div class="scene">
+  <div class="main-title" id="callen-title">
+    <div class="callen-wrap">
+      <span class="callen-letter">C</span>
+      <span class="callen-letter">A</span>
+      <span class="callen-letter">L</span>
+      <span class="callen-letter">L</span>
+      <span class="callen-letter">E</span>
+      <span class="callen-letter">N</span>
+      <!-- Celestial badge inline after N -->
+      <div id="celestial-badge">
+        <div class="celestial-body sun-mode" id="celestial-icon">☀️</div>
+        <div class="celestial-time-label" id="celestial-label" style="color:var(--sun);">DAY</div>
+      </div>
+    </div>
+    <span class="callen-bar"></span>
+    <span class="callen-tagline">DIGITAL CITY EXPLORER</span>
+  </div>
+
+  <!-- Nature frame with mountain -->
+  <svg class="nature-frame" viewBox="0 0 560 560" xmlns="http://www.w3.org/2000/svg" overflow="visible" style="overflow:visible">
+    
+    <!-- MOUNTAIN group -->
+    <g id="mountain-group" class="mountain-group" transform="translate(0,-152)">
+      <defs>
+        <linearGradient id="mtnBodyL" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#1c2d3e"/><stop offset="100%" stop-color="#111e2a"/>
+        </linearGradient>
+        <linearGradient id="mtnBodyR" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#3d5670"/><stop offset="100%" stop-color="#2c4156"/>
+        </linearGradient>
+        <linearGradient id="mtnFar" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#5e7f97" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#3d5c72" stop-opacity="0.3"/>
+        </linearGradient>
+        <linearGradient id="snowG" x1="10%" y1="0%" x2="90%" y2="100%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="55%" stop-color="#d8eeff"/>
+          <stop offset="100%" stop-color="#96bcd6"/>
+        </linearGradient>
+        <radialGradient id="peakH" cx="50%" cy="20%" r="65%">
+          <stop offset="0%" stop-color="rgba(210,235,255,0.6)"/>
+          <stop offset="100%" stop-color="rgba(210,235,255,0)"/>
+        </radialGradient>
+        <radialGradient id="fogG" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="rgba(190,215,235,0.38)"/>
+          <stop offset="100%" stop-color="rgba(190,215,235,0)"/>
+        </radialGradient>
+        <filter id="mtnDrop"><feDropShadow dx="5" dy="8" stdDeviation="6" flood-color="rgba(0,0,0,0.5)"/></filter>
+        <filter id="blur2"><feGaussianBlur stdDeviation="2.5"/></filter>
+        <filter id="blur4"><feGaussianBlur stdDeviation="4"/></filter>
+      </defs>
+
+      <ellipse cx="280" cy="172" rx="135" ry="50" fill="url(#fogG)" filter="url(#blur4)"/>
+      <polygon points="235,58 170,200 300,200" fill="url(#mtnFar)"/>
+      <polygon points="235,58 208,118 262,118" fill="rgba(215,235,250,0.45)"/>
+      <polygon points="325,68 260,200 390,200" fill="url(#mtnFar)" opacity="0.85"/>
+      <polygon points="325,68 300,125 350,125" fill="rgba(215,235,250,0.38)"/>
+      <polygon points="280,8 148,202 412,202" fill="url(#mtnBodyL)" opacity="0.97" filter="url(#mtnDrop)"/>
+      <polygon points="280,8 148,202 280,192" fill="#16232f" opacity="0.7"/>
+      <polygon points="280,8 280,192 412,202" fill="url(#mtnBodyR)" opacity="0.65"/>
+      <polygon points="280,8 222,128 338,120" fill="rgba(40,65,90,0.32)" opacity="0.8"/>
+      
+      <!-- Strata -->
+      <line x1="168" y1="168" x2="278" y2="158" stroke="rgba(80,115,145,0.38)" stroke-width="1.3"/>
+      <line x1="158" y1="182" x2="278" y2="172" stroke="rgba(80,115,145,0.3)"  stroke-width="1.1"/>
+      <line x1="152" y1="194" x2="278" y2="185" stroke="rgba(80,115,145,0.22)" stroke-width="0.9"/>
+      <line x1="282" y1="158" x2="392" y2="172" stroke="rgba(100,135,165,0.33)" stroke-width="1.3"/>
+      <line x1="282" y1="172" x2="396" y2="185" stroke="rgba(100,135,165,0.26)" stroke-width="1.1"/>
+      <line x1="282" y1="185" x2="398" y2="196" stroke="rgba(100,135,165,0.2)"  stroke-width="0.9"/>
+
+      <!-- Crevices -->
+      <path d="M280,8 L268,95 L274,155 L271,195"  fill="none" stroke="rgba(10,25,42,0.42)" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M280,8 L292,90 L286,152 L289,192"  fill="none" stroke="rgba(10,25,42,0.28)" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M212,148 L220,172 L216,196" fill="none" stroke="rgba(15,35,55,0.28)" stroke-width="1.1"/>
+      <path d="M346,145 L354,170 L350,194" fill="none" stroke="rgba(15,35,55,0.24)" stroke-width="1.1"/>
+
+      <!-- SNOW CAP multi-layer -->
+      <polygon points="280,8 238,118 322,118" fill="url(#snowG)" opacity="0.98"/>
+      <polygon points="238,118 280,128 322,118" fill="rgba(130,185,225,0.52)"/>
+      <path d="M238,118 Q224,130 232,142 Q244,132 256,124 Z" fill="rgba(218,240,255,0.78)"/>
+      <path d="M322,118 Q336,128 328,142 Q316,132 304,124 Z" fill="rgba(218,240,255,0.72)"/>
+      <path d="M238,118 Q228,126 234,136" fill="white" opacity="0.68"/>
+      <path d="M254,122 Q246,130 250,138" fill="rgba(230,246,255,0.62)" opacity="0.62"/>
+      <path d="M322,118 Q332,126 326,136" fill="white" opacity="0.65"/>
+      <path d="M306,122 Q314,130 310,138" fill="rgba(230,246,255,0.58)" opacity="0.58"/>
+      <polygon points="280,8 272,62 280,56" fill="white" opacity="0.94"/>
+      <polygon points="280,8 280,56 288,62" fill="rgba(228,246,255,0.78)"/>
+      <ellipse cx="280" cy="62" rx="52" ry="42" fill="url(#peakH)" opacity="0.72"/>
+
+      <!-- Snow sparkles -->
+      <circle cx="272" cy="28" r="2.5" fill="white" opacity="0.95"><animate attributeName="opacity" values="0.95;0.2;0.95" dur="2.1s" repeatCount="indefinite"/><animate attributeName="r" values="2.5;1.3;2.5" dur="2.1s" repeatCount="indefinite"/></circle>
+      <circle cx="288" cy="20" r="2.1" fill="white" opacity="0.88"><animate attributeName="opacity" values="0.88;0.18;0.88" dur="2.9s" repeatCount="indefinite" begin="0.7s"/></circle>
+      <circle cx="280" cy="44" r="1.8" fill="#d8eeff" opacity="0.82"><animate attributeName="opacity" values="0.82;0.2;0.82" dur="2.7s" repeatCount="indefinite" begin="1.3s"/></circle>
+      <circle cx="258" cy="88" r="1.6" fill="white" opacity="0.72"><animate attributeName="opacity" values="0.72;0.14;0.72" dur="3.4s" repeatCount="indefinite" begin="0.4s"/></circle>
+      <circle cx="302" cy="84" r="1.7" fill="white" opacity="0.75"><animate attributeName="opacity" values="0.75;0.16;0.75" dur="2.5s" repeatCount="indefinite" begin="1.9s"/></circle>
+      <circle cx="248" cy="108" r="1.4" fill="#cce8ff" opacity="0.65"><animate attributeName="opacity" values="0.65;0.12;0.65" dur="4s" repeatCount="indefinite" begin="0.9s"/></circle>
+      <circle cx="312" cy="105" r="1.5" fill="white" opacity="0.68"><animate attributeName="opacity" values="0.68;0.14;0.68" dur="3.2s" repeatCount="indefinite" begin="2.4s"/></circle>
+
+      <!-- Cloud wisps -->
+      <ellipse cx="244" cy="98"  rx="28" ry="9"  fill="rgba(255,255,255,0.3)" filter="url(#blur2)"/>
+      <ellipse cx="316" cy="102" rx="25" ry="8"  fill="rgba(255,255,255,0.26)" filter="url(#blur2)"/>
+      <ellipse cx="280" cy="120" rx="38" ry="7"  fill="rgba(255,255,255,0.22)" filter="url(#blur2)"/>
+
+      <!-- Dense pine forest -->
+      <g transform="translate(148,170) scale(0.75)"><rect x="9" y="58" width="8" height="34" rx="1" fill="#3d2b1a"/><polygon points="13,0 -5,40 31,40" fill="#174d22"/><polygon points="13,14 -4,52 30,52" fill="#1e6030"/><polygon points="13,27 -3,62 29,62" fill="#257038"/></g>
+      <g transform="translate(166,175) scale(0.65)"><rect x="8" y="52" width="7" height="30" rx="1" fill="#3d2b1a"/><polygon points="11,0 -3,36 25,36" fill="#1a5828"/><polygon points="11,12 -2,46 24,46" fill="#226a34"/></g>
+      <g transform="translate(181,178) scale(0.56)"><rect x="8" y="48" width="6" height="26" rx="1" fill="#3d2b1a"/><polygon points="11,0 -2,32 24,32" fill="#165224"/><polygon points="11,11 -1,40 23,40" fill="#1e6430"/></g>
+
+      <g transform="translate(372,172) scale(0.72)"><rect x="9" y="55" width="8" height="32" rx="1" fill="#3d2b1a"/><polygon points="13,0 -4,38 30,38" fill="#174d22"/><polygon points="13,13 -3,50 29,50" fill="#1e6030"/><polygon points="13,25 -2,60 28,60" fill="#257038"/></g>
+      <g transform="translate(390,175) scale(0.62)"><rect x="8" y="50" width="7" height="28" rx="1" fill="#3d2b1a"/><polygon points="11,0 -3,34 25,34" fill="#1a5828"/><polygon points="11,12 -2,44 24,44" fill="#226a34"/></g>
+      <g transform="translate(405,177) scale(0.54)"><rect x="8" y="46" width="6" height="24" rx="1" fill="#3d2b1a"/><polygon points="11,0 -2,30 24,30" fill="#165224"/><polygon points="11,10 -1,38 23,38" fill="#1e6430"/></g>
+
+      <g transform="translate(252,162) scale(0.52)"><rect x="8" y="44" width="6" height="22" rx="1" fill="#3d2b1a"/><polygon points="11,0 -2,28 24,28" fill="#0f3d18"/></g>
+      <g transform="translate(268,158) scale(0.48)"><rect x="8" y="42" width="6" height="20" rx="1" fill="#3d2b1a"/><polygon points="11,0 -2,26 24,26" fill="#0f3d18"/></g>
+      <g transform="translate(288,156) scale(0.5)"><rect x="8" y="44" width="6" height="22" rx="1" fill="#3d2b1a"/><polygon points="11,0 -2,28 24,28" fill="#0f3d18"/></g>
+      <g transform="translate(304,158) scale(0.48)"><rect x="8" y="42" width="6" height="20" rx="1" fill="#3d2b1a"/><polygon points="11,0 -2,26 24,26" fill="#0f3d18"/></g>
+
+      <!-- Ground rocks -->
+      <ellipse cx="175" cy="200" rx="12" ry="6"  fill="#1a2c3c" opacity="0.82"/>
+      <ellipse cx="196" cy="202" rx="8"  ry="4.5" fill="#243a4e" opacity="0.72"/>
+      <ellipse cx="250" cy="200" rx="9"  ry="5"  fill="#1a2c3c" opacity="0.7"/>
+      <ellipse cx="310" cy="200" rx="9"  ry="5"  fill="#1a2c3c" opacity="0.72"/>
+      <ellipse cx="364" cy="201" rx="8"  ry="4.5" fill="#243a4e" opacity="0.7"/>
+      <ellipse cx="385" cy="200" rx="11" ry="5.5" fill="#1a2c3c" opacity="0.78"/>
+
+      <!-- Outline -->
+      <polyline points="148,202 280,8 412,202" fill="none" stroke="rgba(80,120,160,0.28)" stroke-width="1.5" stroke-linejoin="round"/>
+
+      <!-- Train tunnel -->
+      <ellipse cx="215" cy="188" rx="18" ry="14" fill="#080c18" opacity="0.92"/>
+      <ellipse cx="215" cy="188" rx="18" ry="14" fill="none" stroke="rgba(60,90,120,0.6)" stroke-width="2"/>
+      <path d="M197,188 A18,14 0 0,1 233,188" fill="none" stroke="rgba(120,160,200,0.35)" stroke-width="2.5" stroke-linecap="round"/>
+      <ellipse cx="215" cy="190" rx="13" ry="9" fill="#040610" opacity="0.8"/>
+      
+      <!-- Tunnel tracks -->
+      <line x1="200" y1="198" x2="230" y2="198" stroke="#6b5a3e" stroke-width="1.2" opacity="0.6"/>
+      <line x1="200" y1="195" x2="230" y2="195" stroke="#6b5a3e" stroke-width="1.2" opacity="0.6"/>
+      <line x1="204" y1="194" x2="204" y2="199" stroke="#8b7355" stroke-width="0.8" opacity="0.5"/>
+      <line x1="210" y1="194" x2="210" y2="199" stroke="#8b7355" stroke-width="0.8" opacity="0.5"/>
+      <line x1="216" y1="194" x2="216" y2="199" stroke="#8b7355" stroke-width="0.8" opacity="0.5"/>
+      <line x1="222" y1="194" x2="222" y2="199" stroke="#8b7355" stroke-width="0.8" opacity="0.5"/>
+      <line x1="228" y1="194" x2="228" y2="199" stroke="#8b7355" stroke-width="0.8" opacity="0.5"/>
+    </g>
+
+    <!-- 🌍 EARTH GLOBE -->
+    <!-- earth-globe removed -->
+
+  </svg>
+
+  <!-- QR CARD -->
+  <div class="qr-card"><div id="qr-ground-shadow"></div>
+    <!-- ── ALIEN SPACESHIP (patrols right side) ── -->
+    <svg id="ufo-ship" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="ufoBodyGrad" cx="45%" cy="35%" r="60%">
+          <stop offset="0%"   stop-color="#e0e8f0"/>
+          <stop offset="45%"  stop-color="#8090a8"/>
+          <stop offset="100%" stop-color="#2a3448"/>
+        </radialGradient>
+        <radialGradient id="ufoDomeGrad" cx="38%" cy="28%" r="62%">
+          <stop offset="0%"   stop-color="rgba(180,240,255,0.95)"/>
+          <stop offset="60%"  stop-color="rgba(60,160,220,0.75)"/>
+          <stop offset="100%" stop-color="rgba(20,80,140,0.5)"/>
+        </radialGradient>
+        <radialGradient id="ufoGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="55%"  stop-color="rgba(0,0,0,0)"/>
+          <stop offset="100%" stop-color="rgba(80,200,255,0.45)"/>
+        </radialGradient>
+        <filter id="ufoBloom">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- engine glow underneath -->
+      <ellipse cx="50" cy="38" rx="28" ry="7" fill="rgba(80,200,255,0.25)">
+        <animate attributeName="ry" values="6;10;6" dur="1.2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.25;0.5;0.25" dur="1.2s" repeatCount="indefinite"/>
+      </ellipse>
+
+      <!-- atmosphere halo -->
+      <ellipse cx="50" cy="29" rx="42" ry="14" fill="url(#ufoGlow)"/>
+
+      <!-- main saucer body -->
+      <ellipse cx="50" cy="30" rx="38" ry="10" fill="url(#ufoBodyGrad)"/>
+
+      <!-- rim detail ring -->
+      <ellipse cx="50" cy="30" rx="38" ry="10" fill="none"
+        stroke="rgba(150,210,255,0.55)" stroke-width="1"/>
+
+      <!-- engine port lights along rim -->
+      <circle cx="24" cy="31" r="2.2" fill="#00e5ff" opacity="0.9" filter="url(#ufoBloom)">
+        <animate attributeName="opacity" values="0.9;0.3;0.9" dur="0.8s" begin="0s"   repeatCount="indefinite"/>
+      </circle>
+      <circle cx="34" cy="33.5" r="2" fill="#7cfc00" opacity="0.9" filter="url(#ufoBloom)">
+        <animate attributeName="opacity" values="0.9;0.3;0.9" dur="0.8s" begin="0.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="50" cy="35" r="2.2" fill="#ff5555" opacity="0.9" filter="url(#ufoBloom)">
+        <animate attributeName="opacity" values="0.9;0.3;0.9" dur="0.8s" begin="0.4s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="66" cy="33.5" r="2" fill="#7cfc00" opacity="0.9" filter="url(#ufoBloom)">
+        <animate attributeName="opacity" values="0.9;0.3;0.9" dur="0.8s" begin="0.6s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="76" cy="31" r="2.2" fill="#00e5ff" opacity="0.9" filter="url(#ufoBloom)">
+        <animate attributeName="opacity" values="0.9;0.3;0.9" dur="0.8s" begin="0.8s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- cockpit dome -->
+      <ellipse cx="50" cy="22" rx="16" ry="11" fill="url(#ufoDomeGrad)"/>
+      <ellipse cx="50" cy="22" rx="16" ry="11" fill="none"
+        stroke="rgba(180,240,255,0.5)" stroke-width="0.8"/>
+      <!-- dome shine -->
+      <ellipse cx="45" cy="17" rx="6" ry="4" fill="rgba(255,255,255,0.35)"/>
+
+      <!-- exhaust beam down -->
+      <ellipse cx="50" cy="39" rx="14" ry="3.5" fill="rgba(100,220,255,0.35)">
+        <animate attributeName="opacity" values="0.35;0.7;0.35" dur="0.6s" repeatCount="indefinite"/>
+      </ellipse>
+    </svg>
+
+    <div class="qr-inner">
+      <div id="qrcode"></div>
+
+      <!-- ══ CITY SVG OVERLAY ══ -->
+      <svg class="city-svg" viewBox="0 0 460 460" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow-road">
+            <feGaussianBlur stdDeviation="2.5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-park">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-nav">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          
+          <radialGradient id="bldgGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="rgba(255,230,0,0.95)"/>
+            <stop offset="35%" stop-color="rgba(180,255,80,0.6)"/>
+            <stop offset="70%" stop-color="rgba(40,200,40,0.28)"/>
+            <stop offset="100%" stop-color="rgba(20,160,20,0)"/>
+          </radialGradient>
+          <filter id="houseGlowFilter" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="3.5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="windowNightGlow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="3" result="glowBlur"/>
+            <feFlood flood-color="rgba(255,240,120,0.85)" result="color"/>
+            <feComposite in="color" in2="glowBlur" operator="in" result="colorGlow"/>
+            <feMerge>
+              <feMergeNode in="colorGlow"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <radialGradient id="parkGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="var(--park-green)" stop-opacity="0.32"/>
+            <stop offset="100%" stop-color="#1a6b2a" stop-opacity="0.12"/>
+          </radialGradient>
+        </defs>
+
+        <!-- ▸ BUILDING GROUND GLOW ELLIPSES -->
+        <ellipse class="bldg-shadow" cx="128" cy="62" rx="20" ry="6" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="154" cy="66" rx="16" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="251" cy="70" rx="17" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="277" cy="60" rx="14" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="120" cy="202" rx="18" ry="6" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="145" cy="204" rx="15" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="266" cy="202" rx="17" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="290" cy="207" rx="13" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="120" cy="335" rx="16" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="145" cy="334" rx="17" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="267" cy="334" rx="18" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="291" cy="337" rx="14" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="418" cy="100" rx="16" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="420" cy="202" rx="18" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="421" cy="333" rx="17" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="38" cy="68" rx="13" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="39" cy="198" rx="17" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="38" cy="346" rx="16" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="39" cy="417" rx="14" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+        <ellipse class="bldg-shadow" cx="419" cy="418" rx="17" ry="5" fill="url(#bldgGlow)" opacity="0.9" filter="url(#houseGlowFilter)"/>
+
+        <!-- ▸ 9 ROAD PATHS (JSON配置的颜色: #4a5963深灰+#c8a84b金黄) -->
+        <!-- R0: Top diagonal boulevard -->
+        <path d="M30,75 C110,52 210,128 310,88 S400,48 432,68" fill="none" stroke="rgba(74,89,99,0.55)" stroke-width="9" stroke-linecap="round" filter="url(#glow-road)"/>
+        <path d="M30,75 C110,52 210,128 310,88 S400,48 432,68" fill="none" stroke="rgba(255,235,150,0.7)" stroke-width="2" stroke-dasharray="14,8" stroke-linecap="round">
+          <animate attributeName="stroke-dashoffset" from="0" to="-110" dur="2s" repeatCount="indefinite"/>
+        </path>
+
+        <!-- R1: Upper horizontal -->
+        <path d="M18,158 C90,142 155,172 235,165 S360,144 442,158" fill="none" stroke="rgba(74,89,99,0.5)" stroke-width="8" stroke-linecap="round" filter="url(#glow-road)"/>
+        <path d="M18,158 C90,142 155,172 235,165 S360,144 442,158" fill="none" stroke="rgba(255,235,150,0.65)" stroke-width="1.5" stroke-dasharray="12,9" stroke-linecap="round">
+          <animate attributeName="stroke-dashoffset" from="0" to="-110" dur="2.2s" repeatCount="indefinite"/>
+        </path>
+
+        <!-- R2: Lower horizontal (reversed) -->
+        <path d="M442,292 C370,278 265,312 165,298 S82,278 18,290" fill="none" stroke="rgba(74,89,99,0.5)" stroke-width="8" stroke-linecap="round" filter="url(#glow-road)"/>
+        <path d="M442,292 C370,278 265,312 165,298 S82,278 18,290" fill="none" stroke="rgba(255,235,150,0.65)" stroke-width="1.5" stroke-dasharray="12,9" stroke-linecap="round">
+          <animate attributeName="stroke-dashoffset" from="0" to="110" dur="2.3s" repeatCount="indefinite"/>
+        </path>
+
+        <!-- R3: Left vertical winding -->
+        <path d="M62,28 C78,128 55,215 72,300 S88,390 94,432" fill="none" stroke="rgba(74,89,99,0.5)" stroke-width="8" stroke-linecap="round" filter="url(#glow-road)"/>
+        <path d="M62,28 C78,128 55,215 72,300 S88,390 94,432" fill="none" stroke="rgba(255,235,150,0.65)" stroke-width="1.5" stroke-dasharray="12,9" stroke-linecap="round">
+          <animate attributeName="stroke-dashoffset" from="0" to="-105" dur="2.5s" repeatCount="indefinite"/>
+        </path>
+
+        <!-- R4: Center vertical -->
+        <path d="M205,22 C190,105 228,198 218,298 S234,388 228,432" fill="none" stroke="rgba(74,89,99,0.5)" stroke-width="8" stroke-linecap="round" filter="url(#glow-road)"/>
+        <path d="M205,22 C190,105 228,198 218,298 S234,388 228,432" fill="none" stroke="rgba(255,235,150,0.65)" stroke-width="1.5" stroke-dasharray="12,9" stroke-linecap="round">
+          <animate attributeName="stroke-dashoffset" from="0" to="105" dur="3s" repeatCount="indefinite"/>
+        </path>
+
+        <!-- R5: Right diagonal arterial -->
+        <path d="M372,28 C345,118 388,205 378,298 S398,388 392,432" fill="none" stroke="rgba(74,89,99,0.5)" stroke-width="8" stroke-linecap="round" filter="url(#glow-road)"/>
+        <path d="M372,28 C345,118 388,205 378,298 S398,388 392,432" fill="none" stroke="rgba(255,235,150,0.65)" stroke-width="1.5" stroke-dasharray="12,9" stroke-linecap="round">
+          <animate attributeName="stroke-dashoffset" from="0" to="-105" dur="2.8s" repeatCount="indefinite"/>
+        </path>
+
+        <!-- R6: Cross diagonal NW→SE -->
+        <path d="M28,175 C80,210 138,235 198,260 S295,310 342,370" fill="none" stroke="rgba(74,89,99,0.42)" stroke-width="6" stroke-linecap="round" filter="url(#glow-road)"/>
+        <path d="M28,175 C80,210 138,235 198,260 S295,310 342,370" fill="none" stroke="rgba(255,235,150,0.55)" stroke-width="1.5" stroke-dasharray="10,8" stroke-linecap="round">
+          <animate attributeName="stroke-dashoffset" from="0" to="-90" dur="3.2s" repeatCount="indefinite"/>
+        </path>
+
+        <!-- R7: Cross diagonal NE→SW -->
+        <path d="M430,175 C380,215 322,238 265,262 S165,310 118,372" fill="none" stroke="rgba(74,89,99,0.42)" stroke-width="6" stroke-linecap="round" filter="url(#glow-road)"/>
+        <path d="M430,175 C380,215 322,238 265,262 S165,310 118,372" fill="none" stroke="rgba(255,235,150,0.55)" stroke-width="1.5" stroke-dasharray="10,8" stroke-linecap="round">
+          <animate attributeName="stroke-dashoffset" from="0" to="90" dur="3.5s" repeatCount="indefinite"/>
+        </path>
+
+        <!-- ▸ PARKS -->
+        <ellipse cx="108" cy="108" rx="50" ry="40" fill="url(#parkGrad)" stroke="rgba(95,163,106,0.55)" stroke-width="2" filter="url(#glow-park)"/>
+        <ellipse cx="312" cy="228" rx="46" ry="36" fill="url(#parkGrad)" stroke="rgba(95,163,106,0.5)" stroke-width="2" filter="url(#glow-park)"/>
+        <ellipse cx="340" cy="368" rx="52" ry="38" fill="url(#parkGrad)" stroke="rgba(95,163,106,0.5)" stroke-width="2" filter="url(#glow-park)"/>
+        <ellipse cx="122" cy="362" rx="36" ry="26" fill="url(#parkGrad)" stroke="rgba(95,163,106,0.45)" stroke-width="1.5" filter="url(#glow-park)"/>
+
+        <!-- ▸ INLINE PINE TREES -->
+        <!-- ... (树木省略,保持原有) ... -->
+
+        <!-- Park tree symbols -->
+        <text x="86" y="104" font-size="15" opacity="0.75">🌳</text>
+        <text x="112" y="90" font-size="12" opacity="0.65">🌲</text>
+        <text x="290" y="224" font-size="15" opacity="0.72">🌳</text>
+        <text x="320" y="358" font-size="14" opacity="0.7">🌳</text>
+        <text x="106" y="356" font-size="13" opacity="0.65">🌳</text>
+
+        <!-- ▸ 20 BLOCK BUILDINGS (原样保留) -->
+        <!-- ... (建筑省略,保持原有) ... -->
+
+        <!-- ▸ FACILITIES (医院、健身房、学校、餐厅) -->
+        <!-- ... (设施省略,保持原有) ... -->
+
+        <!-- ▸ NAVIGATION PATH (JSON配置: 紫色虚线 rgba(99,102,241,0.38), 破折号[8,6]) -->
+        <path d="M62,75 C130,68 178,100 205,160 C232,218 308,228 342,292 S368,360 340,368"
+              fill="none" stroke="rgba(99,102,241,0.2)" stroke-width="8" stroke-linecap="round"/>
+        <path d="M62,75 C130,68 178,100 205,160 C232,218 308,228 342,292 S368,360 340,368"
+              fill="none" stroke="rgba(77,150,255,0.9)" stroke-width="3" stroke-dasharray="8,6" stroke-linecap="round" opacity="0.9" filter="url(#glow-nav)">
+          <animate attributeName="stroke-dashoffset" from="0" to="-560" dur="4s" repeatCount="indefinite"/>
+        </path>
+
+        <!-- NAV pings -->
+        <circle cx="62" cy="75" r="7" fill="rgba(77,150,255,0.9)" opacity="0.9">
+          <animate attributeName="r" values="5;10;5" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="340" cy="368" r="9" fill="var(--red-accent)" opacity="0.9">
+          <animate attributeName="r" values="7;13;7" dur="1.8s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.9;0.3;0.9" dur="1.8s" repeatCount="indefinite"/>
+        </circle>
+        <text x="54" y="68" font-size="10" fill="rgba(77,150,255,0.9)" font-family="monospace" font-weight="bold">A</text>
+        <text x="333" y="362" font-size="10" fill="var(--red-accent)" font-family="monospace" font-weight="bold">B</text>
+
+        <!-- ▸ LOCATION PINS -->
+        <g transform="translate(62,75)"><text x="-8" y="-10" font-size="13">🏠</text></g>
+        <g transform="translate(205,160)">
+          <circle cx="0" cy="0" r="6" fill="var(--yellow-bright)" opacity="0.85"><animate attributeName="r" values="4;8;4" dur="2.5s" repeatCount="indefinite"/></circle>
+          <text x="-9" y="4" font-size="11">☕</text>
+        </g>
+        <g transform="translate(312,228)">
+          <circle cx="0" cy="0" r="6" fill="var(--red-accent)" opacity="0.8"><animate attributeName="r" values="4;8;4" dur="3s" repeatCount="indefinite"/></circle>
+          <text x="-9" y="4" font-size="11">🏥</text>
+        </g>
+        <g transform="translate(178,100)">
+          <circle cx="0" cy="0" r="5" fill="#a29bfe" opacity="0.8"><animate attributeName="r" values="3;7;3" dur="2.2s" repeatCount="indefinite"/></circle>
+          <text x="-8" y="4" font-size="10">🏪</text>
+        </g>
+        <g transform="translate(130,292)">
+          <circle cx="0" cy="0" r="5" fill="var(--blue-nav)" opacity="0.8"><animate attributeName="r" values="3;7;3" dur="2.7s" repeatCount="indefinite"/></circle>
+          <text x="-8" y="4" font-size="10">🏫</text>
+        </g>
+        <g transform="translate(340,368)"><text x="-8" y="-10" font-size="13">🏁</text></g>
+
+        <!-- ▸ ROAD INTERSECTION NODES -->
+        <g filter="url(#glow-road)" opacity="0.85">
+          <circle cx="205" cy="88"  r="8" fill="rgba(200,168,75,0.5)" stroke="rgba(255,235,150,0.9)" stroke-width="2"><animate attributeName="r" values="6;11;6" dur="2.5s" repeatCount="indefinite"/></circle>
+          <circle cx="72"  cy="160" r="7" fill="rgba(200,168,75,0.45)" stroke="rgba(255,235,150,0.8)" stroke-width="1.5"><animate attributeName="r" values="5;10;5" dur="3s" repeatCount="indefinite"/></circle>
+          <circle cx="218" cy="163" r="8" fill="rgba(200,168,75,0.45)" stroke="rgba(255,235,150,0.8)" stroke-width="1.5"><animate attributeName="r" values="6;11;6" dur="2.8s" repeatCount="indefinite"/></circle>
+          <circle cx="378" cy="160" r="7" fill="rgba(200,168,75,0.45)" stroke="rgba(255,235,150,0.8)" stroke-width="1.5"><animate attributeName="r" values="5;10;5" dur="2.3s" repeatCount="indefinite"/></circle>
+          <circle cx="145" cy="294" r="8" fill="rgba(200,168,75,0.45)" stroke="rgba(255,235,150,0.8)" stroke-width="1.5"><animate attributeName="r" values="6;11;6" dur="2.6s" repeatCount="indefinite"/></circle>
+          <circle cx="300" cy="292" r="7" fill="rgba(200,168,75,0.45)" stroke="rgba(255,235,150,0.8)" stroke-width="1.5"><animate attributeName="r" values="5;10;5" dur="3.1s" repeatCount="indefinite"/></circle>
+          <circle cx="198" cy="260" r="6" fill="rgba(200,168,75,0.4)"  stroke="rgba(255,235,150,0.75)" stroke-width="1.5"><animate attributeName="r" values="4;9;4" dur="2.9s" repeatCount="indefinite"/></circle>
+          <circle cx="262" cy="260" r="6" fill="rgba(200,168,75,0.4)"  stroke="rgba(255,235,150,0.75)" stroke-width="1.5"><animate attributeName="r" values="4;9;4" dur="3.3s" repeatCount="indefinite"/></circle>
+        </g>
+
+        <!-- Traffic lights -->
+        <text x="197" y="76"  font-size="10" opacity="0.75">🚦</text>
+        <text x="210" y="151" font-size="9"  opacity="0.7">🚦</text>
+        <text x="138" y="282" font-size="9"  opacity="0.7">🚦</text>
+        <text x="372" y="150" font-size="9"  opacity="0.7">🚦</text>
+      </svg>
+
+      <!-- Scan beam -->
+      <div class="scan-beam"></div>
+
+      <!-- ▸ VEHICLES (JSON配置: 车辆速度28px/s, 黄色#f5d142) -->
+      <div class="v" id="v0a" style="font-size:14px;">🚗</div>
+      <div class="v" id="v0b" style="font-size:12px;">🚕</div>
+      <div class="v" id="v1a" style="font-size:14px;">🚌</div>
+      <div class="v" id="v1b" style="font-size:12px;">🚲</div>
+      <div class="v" id="v2a" style="font-size:13px;">🚚</div>
+      <div class="v" id="v2b" style="font-size:12px;">🛵</div>
+      <div class="v" id="v3a" style="font-size:13px;">🚐</div>
+      <div class="v" id="v3b" style="font-size:11px; filter:drop-shadow(0 0 6px var(--water-teal));">🛸</div>
+      <div class="v" id="v4a" style="font-size:12px;">🏎️</div>
+      <div class="v" id="v4b" style="font-size:11px; filter:drop-shadow(0 0 6px #a29bfe);">🚀</div>
+      <div class="v" id="v5a" style="font-size:13px;">🚑</div>
+      <div class="v" id="v5b" style="font-size:12px;">🚒</div>
+      <div class="v" id="v6a" style="font-size:12px;">🚜</div>
+      <div class="v" id="v6b" style="font-size:11px; filter:drop-shadow(0 0 5px var(--sun));">🛸</div>
+      <div class="v" id="v7a" style="font-size:13px;">🚛</div>
+      <div class="v" id="v7b" style="font-size:12px;">🚓</div>
+
+      <!-- Floating POI icons -->
+      <div class="ficon" style="top:46px;left:108px;animation-duration:3.2s;animation-delay:0s;">🏙️</div>
+      <div class="ficon" style="top:46px;right:85px;animation-duration:2.8s;animation-delay:0.5s;font-size:14px;">🏨</div>
+      <div class="ficon" style="top:400px;left:90px;animation-duration:3.5s;animation-delay:1s;font-size:14px;">🛒</div>
+      <div class="ficon" style="top:400px;right:95px;animation-duration:3s;animation-delay:1.5s;font-size:14px;">🎪</div>
+      <div class="ficon" style="top:220px;left:36px;animation-duration:4s;animation-delay:0.3s;font-size:13px;">🏦</div>
+      <div class="ficon" style="top:215px;right:35px;animation-duration:3.8s;animation-delay:0.8s;font-size:13px;">🍜</div>
+
+      <!-- Corner markers (JSON配置的颜色) -->
+      <div style="position:absolute;top:8px;left:8px;z-index:11;text-align:center;">
+        <div class="corner-marker"><div class="dot" style="background:var(--water-teal);box-shadow:0 0 10px var(--water-teal);"></div><div class="label">N·W</div></div>
+      </div>
+      <div style="position:absolute;top:8px;right:8px;z-index:11;text-align:center;">
+        <div class="corner-marker"><div class="dot" style="background:var(--sun);box-shadow:0 0 10px var(--sun);"></div><div class="label">N·E</div></div>
+      </div>
+      <div style="position:absolute;bottom:8px;left:8px;z-index:11;text-align:center;">
+        <div class="corner-marker"><div class="dot" style="background:var(--red-accent);box-shadow:0 0 10px var(--red-accent);"></div><div class="label">S·W</div></div>
+      </div>
+      <div style="position:absolute;bottom:8px;right:8px;z-index:11;text-align:center;">
+        <div class="corner-marker"><div class="dot" style="background:#a29bfe;box-shadow:0 0 10px #a29bfe;"></div><div class="label">S·E</div></div>
+      </div>
+    </div>
+
+    <!-- TRAIN SYSTEM -->
+    <div id="train-container">
+      <div id="train">🚂</div>
+      <div id="train-headlight"></div>
+    </div>
+
+    <!-- 4-sided clean straight border -->
+    <div class="qr-slab-top"></div>
+    <div class="qr-slab-bottom"></div>
+    <div class="qr-slab-left"></div>
+    <div class="qr-slab-right"></div>
+
+    <!-- BOAT PROGRESS BAR WITH WAVES -->
+    <div class="boat-progress-container">
+      <div class="boat-progress-bar">
+        <div class="boat-progress-fill"></div>
+        <div class="boat-icon">⛵</div>
+      </div>
+      <div class="boat-progress-label">JOURNEY</div>
+      <div id="scan-invite" style="
+        position:absolute; width:100%; top:50px; text-align:center;
+        font-family:'Noto Sans SC','Microsoft YaHei',sans-serif;
+        font-size:22px; color:rgba(255,255,255,0.92);
+        letter-spacing:2px; text-shadow:0 0 12px rgba(100,220,255,0.8), 0 0 24px rgba(80,200,255,0.4);
+        white-space:nowrap;
+      ">📷 扫一扫 · 进入作品集</div>
+    </div>
+
+    <!-- Rocket thruster effect -->
+    <div class="rocket-thruster-wrap">
+      <div class="rocket-engine" id="engine-1"><div class="nozzle"></div><div class="exhaust-core"></div><div class="exhaust-mid"></div><div class="exhaust-plume"></div><div class="mach-diamond"></div><div class="mach-diamond"></div><div class="exhaust-glow"></div></div>
+      <div class="rocket-engine" id="engine-2"><div class="nozzle"></div><div class="exhaust-core"></div><div class="exhaust-mid"></div><div class="exhaust-plume"></div><div class="mach-diamond"></div><div class="mach-diamond"></div><div class="exhaust-glow"></div></div>
+      <div class="rocket-engine" id="engine-3"><div class="nozzle"></div><div class="exhaust-core"></div><div class="exhaust-mid"></div><div class="exhaust-plume"></div><div class="mach-diamond"></div><div class="mach-diamond"></div><div class="exhaust-glow"></div></div>
+      <div class="rocket-engine" id="engine-4"><div class="nozzle"></div><div class="exhaust-core"></div><div class="exhaust-mid"></div><div class="exhaust-plume"></div><div class="mach-diamond"></div><div class="mach-diamond"></div><div class="exhaust-glow"></div></div>
+    </div>
+    <div class="rocket-ground-glow"></div>
+  </div>
+
+  <div class="sub-title">✦ SCAN TO EXPLORE · 扫码探索数字生态 ✦</div>
+</div>
+
+<script>
+// ─── GALAXY BACKGROUND ───────────────────────────────────────────
+const canvas = document.getElementById('galaxy-bg');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const stars = [];
+for (let i = 0; i < 300; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.8 + 0.2,
+    a: Math.random(),
+    speed: Math.random() * 0.008 + 0.003,
+    twinkleOffset: Math.random() * Math.PI * 2
+  });
+}
+
+const nebulae = [
+  { x: canvas.width*0.2, y: canvas.height*0.3, rx: 300, ry: 200, color: 'rgba(80,20,180,0.12)' },
+  { x: canvas.width*0.75, y: canvas.height*0.6, rx: 250, ry: 160, color: 'rgba(20,60,160,0.1)' },
+  { x: canvas.width*0.5, y: canvas.height*0.5, rx: 350, ry: 250, color: 'rgba(10,40,100,0.08)' },
+  { x: canvas.width*0.1, y: canvas.height*0.8, rx: 200, ry: 130, color: 'rgba(100,20,80,0.1)' },
+];
+
+let t = 0;
+function drawGalaxy() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, Math.max(canvas.width, canvas.height)*0.7);
+  grad.addColorStop(0, '#0d1435');
+  grad.addColorStop(0.5, '#080c22');
+  grad.addColorStop(1, '#030610');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  nebulae.forEach(n => {
+    const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.rx);
+    g.addColorStop(0, n.color);
+    g.addColorStop(1, 'transparent');
+    ctx.save();
+    ctx.scale(1, n.ry/n.rx);
+    ctx.beginPath();
+    ctx.arc(n.x, n.y*n.rx/n.ry, n.rx, 0, Math.PI*2);
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.restore();
+  });
+
+  const mw = ctx.createLinearGradient(0, canvas.height*0.3, canvas.width, canvas.height*0.7);
+  mw.addColorStop(0, 'transparent');
+  mw.addColorStop(0.3, 'rgba(140,100,200,0.04)');
+  mw.addColorStop(0.5, 'rgba(100,140,220,0.07)');
+  mw.addColorStop(0.7, 'rgba(140,100,200,0.04)');
+  mw.addColorStop(1, 'transparent');
+  ctx.fillStyle = mw;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  t += 0.01;
+  stars.forEach(s => {
+    const twinkle = 0.3 + 0.7 * (Math.sin(t * s.speed * 100 + s.twinkleOffset) * 0.5 + 0.5);
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${s.a * twinkle})`;
+    ctx.fill();
+    if (s.r > 1.4) {
+      ctx.strokeStyle = `rgba(255,255,255,${s.a * twinkle * 0.4})`;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(s.x - s.r*3, s.y); ctx.lineTo(s.x + s.r*3, s.y);
+      ctx.moveTo(s.x, s.y - s.r*3); ctx.lineTo(s.x, s.y + s.r*3);
+      ctx.stroke();
+    }
+  });
+
+  requestAnimationFrame(drawGalaxy);
+}
+drawGalaxy();
+
+// ─── DAY / NIGHT CYCLE ─────────────────────────────────────────
+let isDay = false;
+const CYCLE_DURATION = 8000;
+
+const celestialIcon  = document.getElementById('celestial-icon');
+const celestialLabel = document.getElementById('celestial-label');
+const callenTitle    = document.getElementById('callen-title');
+const celestialBadge = document.getElementById('celestial-badge');
+const qrInner        = document.querySelector('.qr-inner');
+
+function positionBadge() { /* badge is now inline — no positioning needed */ }
+setTimeout(positionBadge, 400);
+
+function transitionToDay() {
+  isDay = true;
+  document.body.classList.add('day-mode');
+  document.body.classList.remove('night-mode');
+  celestialIcon.textContent = '☀️';
+  celestialIcon.className   = 'celestial-body sun-mode';
+  celestialLabel.textContent = 'DAY';
+  celestialLabel.style.color = 'var(--sun)';
+  qrInner.classList.add('day-qr');
+  qrInner.classList.remove('night-qr');
+  document.querySelectorAll('.bldg-win').forEach(w => {
+    w.setAttribute('fill', w.dataset.origFill);
+    w.removeAttribute('filter');
+  });
+}
+
+function transitionToNight() {
+  isDay = false;
+  document.body.classList.add('night-mode');
+  document.body.classList.remove('day-mode');
+  celestialIcon.textContent = '🌙';
+  celestialIcon.className   = 'celestial-body moon-mode';
+  celestialLabel.textContent = 'NIGHT';
+  celestialLabel.style.color = '#a29bfe';
+  qrInner.classList.add('night-qr');
+  qrInner.classList.remove('day-qr');
+  document.querySelectorAll('.bldg-win').forEach(w => {
+    w.setAttribute('fill', 'rgba(255,255,180,1)');
+    w.setAttribute('filter', 'url(#windowNightGlow)');
+  });
+}
+
+transitionToNight();
+setInterval(() => {
+  if (isDay) transitionToNight();
+  else       transitionToDay();
+  positionBadge();
+}, CYCLE_DURATION);
+
+// ─── QR CODE GENERATION (JSON配置的目标URL) ───────────────
+new QRCode(document.getElementById("qrcode"), {
+  text: "https://songtiansongtianxiangtai-web.github.io/github.io/#works",
+  width: 460,
+  height: 460,
+  colorDark: "#0d2010",
+  colorLight: "rgba(245,252,242,0.94)",
+  correctLevel: QRCode.CorrectLevel.H
+});
+
+// ─── BUILDING WINDOW DETECTION ────────────────────────────────
+(function() {
+  const citySvg = document.querySelector('.city-svg');
+  if (!citySvg) return;
+  const allRects = citySvg.querySelectorAll('rect');
+  allRects.forEach(rect => {
+    const fill = rect.getAttribute('fill') || '';
+    if (fill.includes('255,255,200')) {
+      const w = parseFloat(rect.getAttribute('width'));
+      const h = parseFloat(rect.getAttribute('height'));
+      if (w <= 8 && h <= 8) {
+        rect.classList.add('bldg-win');
+        rect.dataset.origFill = fill;
+      }
+    }
+  });
+  document.querySelectorAll('.bldg-win').forEach(w => {
+    w.setAttribute('fill', 'rgba(255,255,180,1)');
+    w.setAttribute('filter', 'url(#windowNightGlow)');
+  });
+})();
+
+// ─── BOAT PROGRESS WITH WAVE SPLASHES ──────────────────────────
+(function() {
+  const progressBar = document.querySelector('.boat-progress-bar');
+  const progressFill = document.querySelector('.boat-progress-fill');
+  const boatIcon = document.querySelector('.boat-icon');
+
+  function createWaveSplash(x) {
+    const splash = document.createElement('div');
+    splash.className = 'boat-wave-splash';
+    splash.style.left = (x - 6) + 'px';
+    splash.style.top = '-8px';
+    progressBar.appendChild(splash);
+    setTimeout(() => splash.remove(), 1200);
+  }
+
+  // Generate splashes periodically based on progress animation
+  let lastSplashProgress = 0;
+  setInterval(() => {
+    const computedStyle = window.getComputedStyle(progressFill);
+    const matrix = new DOMMatrix(computedStyle.transform);
+    const width = parseFloat(computedStyle.width);
+    const progress = (width / progressBar.offsetWidth) * 100;
+
+    // Create splashes at intervals
+    if (progress > lastSplashProgress + 5) {
+      const x = (progress / 100) * (progressBar.offsetWidth - 12);
+      createWaveSplash(x);
+      lastSplashProgress = progress;
+    } else if (progress < lastSplashProgress - 5) {
+      lastSplashProgress = progress;
+    }
+  }, 200);
+})();
+
+// ─── VEHICLE PATH ANIMATION (JSON配置: 车辆速度28px/s) ───────
+function bezierPoint(t, p0, p1, p2, p3) {
+  const mt = 1 - t;
+  return {
+    x: mt*mt*mt*p0.x + 3*mt*mt*t*p1.x + 3*mt*t*t*p2.x + t*t*t*p3.x,
+    y: mt*mt*mt*p0.y + 3*mt*mt*t*p1.y + 3*mt*t*t*p2.y + t*t*t*p3.y
+  };
+}
+function bezierTangent(t, p0, p1, p2, p3) {
+  const mt = 1 - t;
+  return {
+    x: 3*(mt*mt*(p1.x-p0.x) + 2*mt*t*(p2.x-p1.x) + t*t*(p3.x-p2.x)),
+    y: 3*(mt*mt*(p1.y-p0.y) + 2*mt*t*(p2.y-p1.y) + t*t*(p3.y-p2.y))
+  };
+}
+
+const roads = [
+  { p0:{x:30,y:75}, p1:{x:156,y:46}, p2:{x:256,y:130}, p3:{x:432,y:68} },
+  { p0:{x:18,y:158}, p1:{x:155,y:142}, p2:{x:304,y:172}, p3:{x:442,y:158} },
+  { p0:{x:442,y:292}, p1:{x:320,y:278}, p2:{x:165,y:312}, p3:{x:18,y:290} },
+  { p0:{x:62,y:28}, p1:{x:82,y:128}, p2:{x:58,y:252}, p3:{x:94,y:432} },
+  { p0:{x:205,y:22}, p1:{x:186,y:128}, p2:{x:230,y:252}, p3:{x:228,y:432} },
+  { p0:{x:372,y:28}, p1:{x:342,y:118}, p2:{x:390,y:252}, p3:{x:392,y:432} },
+  { p0:{x:28,y:175}, p1:{x:138,y:222}, p2:{x:248,y:268}, p3:{x:342,y:370} },
+  { p0:{x:430,y:175}, p1:{x:322,y:228}, p2:{x:212,y:268}, p3:{x:118,y:372} },
+];
+
+const vehicles = [
+  { id:'v0a', roadIdx:0, t:0.00, speed:0.0018 },
+  { id:'v0b', roadIdx:0, t:0.50, speed:0.0018 },
+  { id:'v1a', roadIdx:1, t:0.10, speed:0.0022 },
+  { id:'v1b', roadIdx:1, t:0.60, speed:0.0022 },
+  { id:'v2a', roadIdx:2, t:0.00, speed:0.0016 },
+  { id:'v2b', roadIdx:2, t:0.50, speed:0.0016 },
+  { id:'v3a', roadIdx:3, t:0.20, speed:0.0014 },
+  { id:'v3b', roadIdx:3, t:0.70, speed:0.0014 },
+  { id:'v4a', roadIdx:4, t:0.05, speed:0.0020 },
+  { id:'v4b', roadIdx:4, t:0.55, speed:0.0020 },
+  { id:'v5a', roadIdx:5, t:0.30, speed:0.0015 },
+  { id:'v5b', roadIdx:5, t:0.80, speed:0.0015 },
+  { id:'v6a', roadIdx:6, t:0.10, speed:0.0017 },
+  { id:'v6b', roadIdx:6, t:0.60, speed:0.0017 },
+  { id:'v7a', roadIdx:7, t:0.15, speed:0.0019 },
+  { id:'v7b', roadIdx:7, t:0.65, speed:0.0019 },
+];
+
+vehicles.forEach(v => { v.el = document.getElementById(v.id); });
+
+function animateVehicles() {
+  vehicles.forEach(v => {
+    v.t += v.speed;
+    if (v.t > 1) v.t -= 1;
+    const r = roads[v.roadIdx];
+    const pos = bezierPoint(v.t, r.p0, r.p1, r.p2, r.p3);
+    const tan = bezierTangent(v.t, r.p0, r.p1, r.p2, r.p3);
+    const angle = Math.atan2(tan.y, tan.x) * 180 / Math.PI;
+    const flip = (angle > 90 || angle < -90) ? 'scaleX(-1)' : 'scaleX(1)';
+    if (v.el) {
+      v.el.style.left = (pos.x - 8) + 'px';
+      v.el.style.top  = (pos.y - 8) + 'px';
+      v.el.style.transform = flip;
+    }
+  });
+  requestAnimationFrame(animateVehicles);
+}
+animateVehicles();
+
+// ─── TRAIN ANIMATION ─────────────────────────────────────────
+(function() {
+  const trainEl = document.getElementById('train');
+  const headlightEl = document.getElementById('train-headlight');
+  const trainContainer = document.getElementById('train-container');
+
+  const trainPath = [
+    /* Start inside tunnel (cx=215,cy=188 group-local → qr-card x≈165,y≈-15) */
+    { p0:{x:165,y:-18}, p1:{x:165,y:10},  p2:{x:135,y:38},  p3:{x:62,y:75} },
+    { p0:{x:62,y:75},    p1:{x:130,y:68},  p2:{x:178,y:100}, p3:{x:205,y:160} },
+    { p0:{x:205,y:160},  p1:{x:232,y:218}, p2:{x:308,y:228}, p3:{x:342,y:292} },
+    { p0:{x:342,y:292},  p1:{x:376,y:356}, p2:{x:368,y:360}, p3:{x:340,y:368} },
+  ];
+
+  function segLen(seg, steps) {
+    let len = 0;
+    let prev = seg.p0;
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
+      const pt = bezierPoint(t, seg.p0, seg.p1, seg.p2, seg.p3);
+      len += Math.hypot(pt.x - prev.x, pt.y - prev.y);
+      prev = pt;
+    }
+    return len;
+  }
+  const segLens = trainPath.map(s => segLen(s, 80));
+  const totalLen = segLens.reduce((a,b) => a+b, 0);
+  const segBounds = [];
+  let cum = 0;
+  for (const l of segLens) {
+    const start = cum / totalLen;
+    cum += l;
+    segBounds.push({ start, end: cum / totalLen });
+  }
+
+  function getTrainPos(globalT) {
+    for (let i = 0; i < segBounds.length; i++) {
+      const { start, end } = segBounds[i];
+      if (globalT <= end || i === segBounds.length - 1) {
+        const localT = Math.min(1, Math.max(0, (globalT - start) / (end - start)));
+        const seg = trainPath[i];
+        const pos = bezierPoint(localT, seg.p0, seg.p1, seg.p2, seg.p3);
+        const tan = bezierTangent(localT, seg.p0, seg.p1, seg.p2, seg.p3);
+        return { pos, tan, segIdx: i };
+      }
+    }
+  }
+
+  const TRAIN_CYCLE = CYCLE_DURATION; // synced: train = day/night cycle = boat progress
+  let trainStart = performance.now();
+  let lastTrackT = -1;
+  const trackInterval = 0.025;
+  let trackCount = 0;
+  const maxTracks = 60;
+  let lastSteamTime = 0;
+
+  function createTrack(x, y, angle) {
+    const track = document.createElement('div');
+    track.className = 'rail-track';
+    track.style.left = (x - 8) + 'px';
+    track.style.top = (y - 3) + 'px';
+    track.style.transform = `rotate(${angle}deg)`;
+    const rl = document.createElement('div'); rl.className = 'rail-l';
+    const rr = document.createElement('div'); rr.className = 'rail-r';
+    track.appendChild(rl);
+    track.appendChild(rr);
+    for (let i = 0; i < 4; i++) {
+      const tie = document.createElement('div');
+      tie.className = 'tie';
+      tie.style.left = (1 + i * 4) + 'px';
+      track.appendChild(tie);
+    }
+    trainContainer.appendChild(track);
+    trackCount++;
+    if (trackCount > maxTracks) {
+      const oldTracks = trainContainer.querySelectorAll('.rail-track:not(.fading)');
+      if (oldTracks.length > maxTracks - 10) {
+        for (let i = 0; i < 5 && i < oldTracks.length; i++) {
+          oldTracks[i].classList.add('fading');
+          setTimeout(() => oldTracks[i].remove(), 2000);
+        }
+      }
+    }
+  }
+
+  function createSteam(x, y) {
+    const puff = document.createElement('div');
+    puff.className = 'steam-puff';
+    puff.style.left = (x - 7 + Math.random() * 10 - 5) + 'px';
+    puff.style.top = (y - 20 + Math.random() * 6 - 3) + 'px';
+    const size = 10 + Math.random() * 10;
+    puff.style.width = size + 'px';
+    puff.style.height = size + 'px';
+    trainContainer.appendChild(puff);
+    setTimeout(() => puff.remove(), 1300);
+  }
+
+  function animateTrain(now) {
+    const elapsed = (now - trainStart) % TRAIN_CYCLE;
+    const globalT = elapsed / TRAIN_CYCLE;
+
+    const data = getTrainPos(globalT);
+    if (!data) { requestAnimationFrame(animateTrain); return; }
+    const { pos, tan, segIdx } = data;
+    const angle = Math.atan2(tan.y, tan.x) * 180 / Math.PI;
+
+    const trainSize = 52;
+    const ox = trainSize / 2;
+    trainEl.style.left = (pos.x - ox) + 'px';
+    trainEl.style.top = (pos.y - ox) + 'px';
+    const flip = (angle > 90 || angle < -90) ? 'scaleX(-1)' : 'scaleX(1)';
+    trainEl.style.transform = flip;
+
+    const headAngleRad = Math.atan2(tan.y, tan.x);
+    headlightEl.style.left = (pos.x + Math.cos(headAngleRad) * 30 - 40) + 'px';
+    headlightEl.style.top = (pos.y + Math.sin(headAngleRad) * 30 - 20) + 'px';
+    headlightEl.style.transform = `rotate(${angle}deg)`;
+
+    if (segIdx >= 0) {
+      if (lastTrackT < 0 || globalT - lastTrackT >= trackInterval || globalT < lastTrackT) {
+        if (globalT < lastTrackT) {
+          const oldTracks = trainContainer.querySelectorAll('.rail-track');
+          oldTracks.forEach(t => { t.classList.add('fading'); setTimeout(() => t.remove(), 2000); });
+          trackCount = 0;
+        }
+        if (pos.y > -10) {
+          const headRad = Math.atan2(tan.y, tan.x);
+          const aheadX = pos.x + Math.cos(headRad) * 20;
+          const aheadY = pos.y + Math.sin(headRad) * 20;
+          createTrack(aheadX, aheadY, angle);
+        }
+        lastTrackT = globalT;
+      }
+    }
+
+    if (now - lastSteamTime > 120) {
+      createSteam(pos.x, pos.y);
+      lastSteamTime = now;
+    }
+
+    requestAnimationFrame(animateTrain);
+  }
+  requestAnimationFrame(animateTrain);
+})();
+
+// ─── ROCKET SPARK PARTICLES ─────────────────────────────────
+(function() {
+  const qrCard = document.querySelector('.qr-card');
+  if (!qrCard) return;
+  
+  const sparkColors = [
+    'rgba(255,200,80,0.95)',
+    'rgba(255,160,40,0.9)',
+    'rgba(255,120,30,0.85)',
+    'rgba(100,180,255,0.8)',
+    'rgba(255,255,200,0.9)',
+    'rgba(255,80,20,0.7)'
+  ];
+  
+  function createRocketSpark() {
+    const spark = document.createElement('div');
+    spark.className = 'rocket-spark';
+    spark.style.background = sparkColors[Math.floor(Math.random() * sparkColors.length)];
+    spark.style.boxShadow = `0 0 3px ${spark.style.background}`;
+    const size = 1.5 + Math.random() * 3;
+    spark.style.width = size + 'px';
+    spark.style.height = size + 'px';
+    const x = 120 + Math.random() * 220;
+    spark.style.left = x + 'px';
+    spark.style.bottom = '60px';
+    spark.style.setProperty('--sx', (Math.random() * 30 - 15) + 'px');
+    qrCard.appendChild(spark);
+    setTimeout(() => spark.remove(), 750);
+  }
+  
+  setInterval(() => {
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => createRocketSpark(), Math.random() * 100);
+    }
+  }, 100);
+})();
+
+// ─── MOBILE RESPONSIVE SCALING ──────────────────────────────
+function applyMobileScale() {
+  const scene = document.querySelector('.scene');
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const sceneW = 700;
+  const sceneH = 880;
+  const BASE = 0.8; // global 80% scale
+
+  if (vw < 760) {
+    const scaleX = vw / sceneW;
+    const scaleY = vh / sceneH;
+    const scale = Math.min(scaleX, scaleY, 0.58) * BASE;
+    scene.style.transform = `scale(${scale})`;
+    scene.style.transformOrigin = 'top center';
+    document.body.style.minHeight = (sceneH * scale + 20) + 'px';
+    document.body.style.alignItems = 'flex-start';
+    document.body.style.paddingTop = '10px';
+  } else {
+    scene.style.transform = `scale(${BASE})`;
+    scene.style.transformOrigin = 'top center';
+    document.body.style.minHeight = (sceneH * BASE + 20) + 'px';
+    document.body.style.alignItems = '';
+    document.body.style.paddingTop = '';
+  }
+}
+applyMobileScale();
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  applyMobileScale();
+});
+
+// ─── PROGRESSIVE ENGINE BRIGHTNESS (boat position → each engine) ─────────
+(function() {
+  const engines = [
+    document.getElementById('engine-1'),
+    document.getElementById('engine-2'),
+    document.getElementById('engine-3'),
+    document.getElementById('engine-4'),
+  ];
+  // Boat passes each engine at 0%, 25%, 50%, 75% of the cycle
+  const thresholds = [0, 0.25, 0.50, 0.75];
+  const ANIM_DURATION = 8000; // must match boat & CYCLE_DURATION
+  const animStart = performance.now();
+
+  function updateEngines(now) {
+    const elapsed  = (now - animStart) % ANIM_DURATION;
+    const progress = elapsed / ANIM_DURATION; // 0 → 1
+    const isNight  = document.body.classList.contains('night-mode');
+
+    engines.forEach((eng, i) => {
+      if (!eng) return;
+      // Ramp: 0 before threshold, 0→1 over the next 25% of cycle
+      const local = Math.min(1, Math.max(0, (progress - thresholds[i]) / 0.25));
+      // Day:   100% → 200%;  Night: 200% → 300%
+      const base = isNight ? 2.0 : 1.0;
+      const peak = isNight ? 3.0 : 2.0;
+      const bri  = base + (peak - base) * local;
+      const sat  = isNight ? (1.5 + 0.5 * local) : (1.0 + 0.3 * local);
+      eng.style.filter = `brightness(${bri.toFixed(2)}) saturate(${sat.toFixed(2)})`;
+    });
+    requestAnimationFrame(updateEngines);
+  }
+  requestAnimationFrame(updateEngines);
+})();
+
+  // ── Beijing Real-Time Clock ──
+  function updateBeijingClock() {
+    const now = new Date();
+    // Beijing = UTC+8
+    const bjOffset = 8 * 60;
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const bj = new Date(utc + bjOffset * 60000);
+    const hh = String(bj.getHours()).padStart(2,'0');
+    const mm = String(bj.getMinutes()).padStart(2,'0');
+    const ss = String(bj.getSeconds()).padStart(2,'0');
+    const yyyy = bj.getFullYear();
+    const mo = String(bj.getMonth()+1).padStart(2,'0');
+    const dd = String(bj.getDate()).padStart(2,'0');
+    const days = ['周日','周一','周二','周三','周四','周五','周六'];
+    const dow = days[bj.getDay()];
+    document.getElementById('bj-time').textContent = hh+':'+mm+':'+ss;
+    document.getElementById('bj-date').textContent = yyyy+'/'+mo+'/'+dd+' '+dow;
+  }
+  updateBeijingClock();
+  setInterval(updateBeijingClock, 1000);
+
+</script>
+</body>
+</html>
